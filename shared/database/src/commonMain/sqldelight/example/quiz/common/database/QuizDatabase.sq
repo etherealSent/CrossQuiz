@@ -1,0 +1,53 @@
+CREATE TABLE IF NOT EXISTS QuizEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    orderNum INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    themeList TEXT NOT NULL
+--     imageUrl TEXT NOT NULL,
+--     creatorName TEXT NOT NULL DEFAULT "CREATOR",
+--     startDate TEXT NOT NULL DEFAULT ""
+);
+
+selectAll:
+SELECT *
+FROM QuizEntity;
+
+select:
+SELECT *
+FROM QuizEntity
+WHERE id = :id;
+
+add:
+INSERT INTO QuizEntity(orderNum, title, themeList)
+VALUES ((CASE (SELECT COUNT(*) FROM QuizEntity) WHEN 0 THEN 1 ELSE (SELECT MAX(orderNum)+1 FROM QuizEntity) END), :title, :themeList);
+
+setTitle:
+UPDATE QuizEntity
+SET title = :title
+WHERE id = :id;
+
+setThemeList:
+UPDATE QuizEntity
+SET themeList = :themeList
+WHERE id = :id;
+
+-- setImageUrl:
+-- UPDATE QuizEntity
+-- SET imageUrl = :imageUrl
+-- WHERE id = :id;
+
+-- setCreatorName:
+-- UPDATE QuizEntity
+-- SET creatorName = :creatorName
+-- WHERE id = :id;
+
+-- setStartDate:
+-- UPDATE QuizEntity
+-- SET startDate = :startDate
+-- WHERE id = :id;
+
+getLastInsertedId:
+SELECT last_insert_rowid();
+
+clear:
+DELETE FROM QuizEntity;
