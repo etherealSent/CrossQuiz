@@ -11,10 +11,11 @@ kotlin {
             dependencies {
 //                implementation(project(":shared:utils"))
                 implementation(project(":shared:database"))
+                implementation(project(":shared:network"))
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.arkivanov.mvikotlin)
-                implementation(libs.arkivanov.mvikotlin.extensions.reaktive)
-                implementation(libs.badoo.reaktive)
+                implementation(libs.arkivanov.mvikotlin.extensions.coroutines)
+                //implementation(libs.kotlinx.coroutines.android)
             }
         }
 

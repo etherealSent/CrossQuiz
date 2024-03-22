@@ -8,6 +8,8 @@ arkivanov-mvikotlin = "4.0.0-alpha01"
 arkivanov-decompose = "3.0.0-alpha02"
 arkivanov-essenty = "2.0.0-alpha02"
 badoo-reaktive = "2.0.1"
+ktor = "2.3.9"
+ktorfit = "1.12.0"
 sqldelight = "2.0.1"
 kotlin-serialization = "1.6.2"
 core-ktx = "1.12.0"
@@ -27,6 +29,7 @@ kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializat
 kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
 # Android libraries
 android-tools-build-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-tools-build-gradle" }
@@ -39,6 +42,7 @@ arkivanov-mvikotlin-main = { module = "com.arkivanov.mvikotlin:mvikotlin-main", 
 arkivanov-mvikotlin-logging = { module = "com.arkivanov.mvikotlin:mvikotlin-logging", version.ref = "arkivanov-mvikotlin" }
 arkivanov-mvikotlin-timetravel = { module = "com.arkivanov.mvikotlin:mvikotlin-timetravel", version.ref = "arkivanov-mvikotlin" }
 arkivanov-mvikotlin-extensions-reaktive = { module = "com.arkivanov.mvikotlin:mvikotlin-extensions-reaktive", version.ref = "arkivanov-mvikotlin" }
+arkivanov-mvikotlin-extensions-coroutines = { module = "com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines", version.ref = "arkivanov-mvikotlin" }
 arkivanov-decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "arkivanov-decompose" }
 arkivanov-decompose-extensions-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "arkivanov-decompose" }
 arkivanov-essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "arkivanov-essenty" }
@@ -47,6 +51,11 @@ arkivanov-essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", vers
 badoo-reaktive = { module = "com.badoo.reaktive:reaktive", version.ref = "badoo-reaktive" }
 badoo-reaktive-coroutines-interop = { module = "com.badoo.reaktive:coroutines-interop", version.ref = "badoo-reaktive" }
 badoo-reaktive-testing = { module = "com.badoo.reaktive:reaktive-testing", version.ref = "badoo-reaktive" }
+
+# Network libraries
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktorfit = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
 
 # Squareup libraries
 squareup-sqldelight-gradle-plugin = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
@@ -69,4 +78,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 android-application = { id = "com.android.application", version.ref = "android-tools-build-gradle" }
 android-library = { id = "com.android.library", version.ref = "android-tools-build-gradle" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+ktorfit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 squareup-sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
