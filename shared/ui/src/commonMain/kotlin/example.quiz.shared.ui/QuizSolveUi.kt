@@ -1,8 +1,6 @@
 package example.quiz.shared.ui
 
-import Answers
 import Question
-import QuizSolveComponent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,7 +43,7 @@ import kotlinx.coroutines.Dispatchers
 
 // TODO ELDAR colors and paddings in separate theme file
 //@Composable
-//fun QuizSolveScreen(component: QuizSolveComponent) {
+//fun QuizSolveScreen(component: integration.QuizSolveComponent) {
 //    val currentQuestion by component.currentQuestion.collectAsState(Dispatchers.Main.immediate)
 //    Surface {
 //        Scaffold(
