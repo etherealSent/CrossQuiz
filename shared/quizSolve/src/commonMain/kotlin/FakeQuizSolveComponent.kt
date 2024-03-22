@@ -1,5 +1,3 @@
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -43,10 +41,4 @@ class FakeQuizSolveComponent: QuizSolveComponent {
         ))
 
     override fun onNextButtonClick() = Unit
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun QuizSolveScreenPreview() {
-    QuizSolveScreen(FakeQuizSolveComponent())
 }

@@ -10,9 +10,9 @@ import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.observeOn
 import com.badoo.reaktive.scheduler.mainScheduler
-import com.example.quiz.dialog.Setup
 import com.example.quiz.dialog.store.QuizDialogStore
-import com.example.quiz.quizList.QuizListItem
+import example.quiz.shared.quizlist.QuizListItem
+import example.quiz.shared.quizlist.Setup
 
 class QuizDialogStoreProvider(
     private val storeFactory: StoreFactory,
@@ -73,7 +73,7 @@ class QuizDialogStoreProvider(
                 is Msg.QuizDialogLoaded -> copy(title = "", setup = Setup.Default)
                 is Msg.QuizSetupChanged -> copy(setup = msg.setup)
                 is Msg.QuizTitleChanged -> copy(title = msg.title)
-                is Msg.QuizThemePicked -> update(id = msg.id) { copy(themes = this.themes + msg.theme)}
+                is Msg.QuizThemePicked -> update(id = msg.id) { copy(themeList = this.themeList + msg.theme)}
             }
         private inline fun QuizDialogStore.State.update(id: Long, func: QuizListItem.() -> QuizListItem): QuizDialogStore.State {
             val quizListItem = quizList.find { it.id == id } ?: return this
@@ -85,10 +85,10 @@ class QuizDialogStoreProvider(
             val oldQuizes = quizList.associateByTo(mutableMapOf(), QuizListItem::id)
             val oldQuiz: QuizListItem? = oldQuizes.put(quiz.id, quiz)
 
-            return copy(quizList = if (oldQuiz?.order == quiz.order) oldQuizes.values.toList() else oldQuizes.values.sorted())
+            return copy(quizList = if (oldQuiz?.orderNum == quiz.orderNum) oldQuizes.values.toList() else oldQuizes.values.sorted())
         }
 
-        private fun Iterable<QuizListItem>.sorted(): List<QuizListItem> = sortedByDescending(QuizListItem::order)
+        private fun Iterable<QuizListItem>.sorted(): List<QuizListItem> = sortedByDescending(QuizListItem::orderNum)
     }
 
     interface Database {
