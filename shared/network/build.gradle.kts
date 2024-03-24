@@ -13,12 +13,5 @@ kotlin {
                 implementation(libs.ktorfit)
             }
         }
-
-        androidMain {
-            dependencies {
-                implementation(libs.ktor.client.core)
-                implementation(libs.ktorfit)
-            }
-        }
     }
 }

@@ -3,7 +3,7 @@ plugins {
     id("android-setup")
 }
 
-android.namespace = "example.todo.shared.quizSolve"
+android.namespace = "example.quiz.shared.quizSolve"
 
 kotlin {
     sourceSets {
