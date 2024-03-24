@@ -5,6 +5,7 @@ plugins {
 }
 
 android.namespace = "example.quiz.shared.ui"
+
 kotlin {
     sourceSets {
         commonMain {
