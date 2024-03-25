@@ -31,5 +31,6 @@ include(
     ":shared:ui",
     ":shared:network",
     ":shared:quizResult",
-    ":shared:quizSolve"
+    ":shared:quizSolve",
+    ":shared:utils"
 )

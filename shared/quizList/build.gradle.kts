@@ -9,7 +9,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-//                implementation(project(":shared:utils"))
+                implementation(project(":shared:utils"))
                 implementation(project(":shared:database"))
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.arkivanov.mvikotlin)

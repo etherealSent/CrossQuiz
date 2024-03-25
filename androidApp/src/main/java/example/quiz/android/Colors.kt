@@ -1,4 +1,4 @@
-package com.example.quiz.android
+package example.quiz.android
 
 import androidx.compose.ui.graphics.Color
 
