@@ -25,11 +25,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.BottomAppBar
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,156 +40,129 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 
 import androidx.compose.ui.unit.dp
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import example.quiz.shared.quizlist.integration.QuizListComponent
 
-//@Composable
-//fun QuizMainContent() {
-//    Scaffold(
-//        floatingActionButton = { FloatingActionButton(onClick = {}) },
-//        bottomBar = { BottomBar() }
-//    ) {
-//        Column(modifier = Modifier.padding(it)) {
-//            ListItem(
-//                list = listOf(
-//                    QuizListItem(
-//                        id = 0L,
-//                        title = "Название теста",
-//                        imageUrl = "",
-//                        themes = listOf("1", "2"),
-//                        creatorName = "Имя создателя теста",
-//                        startDate = "Старт - dd.mm.yyyy"
-//                    ),
-//                    QuizListItem(
-//                        id = 0L,
-//                        title = "Название теста",
-//                        imageUrl = "",
-//                        themes = listOf("1", "2"),
-//                        creatorName = "Имя создателя теста",
-//                        startDate = "Старт - dd.mm.yyyy"
-//                    )
-//                ),
-//                onItemClicked = {}
-//            )
-//        }
-//
-//    }
-//}
-//
-//@Composable
-//private fun ListItem(
-//    list: List<QuizListItem>,
-//    onItemClicked: (id: Long) -> Unit,
-//    nameOfList: String = "Доступные тесты"
-//) {
-//    Column(modifier = Modifier.padding(top = 20.dp)) {
-//        Text(text = nameOfList, modifier = Modifier.padding(start = 20.dp))
-//        Box(modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(horizontal = 10.dp) ) {
-//            val listState = rememberLazyListState()
-//
-//            LazyColumn(state = listState) {
-//                items(list) { item ->
-//                    Item(
-//                        item = item,
-//                        onItemClicked = onItemClicked,
-//                        modifier = Modifier
-//                            .padding(vertical = 20.dp)
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//private fun Item(
-//    item: QuizListItem,
-//    onItemClicked: (Long) -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    Box(modifier = modifier
+@Composable
+fun QuizListContent(component: QuizListComponent) {
+    val model by component.models.subscribeAsState()
+    Scaffold(
+        floatingActionButton = { FAB(onClick = component::onAddItemClicked) },
+        bottomBar = { BottomBar() }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            ListItem(
+                list = model.items
+            )
+        }
+    }
+}
+
+@Composable
+private fun ListItem(
+    list: List<QuizListItem>,
+    nameOfList: String = "Доступные тесты"
+) {
+    Column(modifier = Modifier.padding(top = 20.dp)) {
+        Text(text = nameOfList, modifier = Modifier.padding(start = 20.dp))
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp) ) {
+            val listState = rememberLazyListState()
+
+            LazyColumn(state = listState) {
+                items(list) { item ->
+                    Item(
+                        item = item,
+                        modifier = Modifier
+                            .padding(vertical = 20.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Item(
+    item: QuizListItem,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier
 //        .clickable { onItemClicked(item.id) }
-//        .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
-//        .fillMaxWidth()
-//    ) {
-//        Column(modifier = Modifier
-//            .padding(10.dp)
-//            .fillMaxWidth()) {
-//            Row {
-//                //ImageBox
-//                Box(
-//                    modifier = Modifier
-//                        .size(105.dp)
-//                        .background(Color.Red, RoundedCornerShape(10.dp))
-//                )
-//                Spacer(modifier = Modifier.width(20.dp))
-//                Column {
-//                    Text(
-//                        text = item.title
-//                    )
-//                    Spacer(modifier = Modifier.height(5.dp))
-//                    Row {
-//                        Text(text = "От")
-//                        Spacer(modifier = Modifier.width(5.dp))
-//                        Box(
-//                            modifier = Modifier
-//                                .clip(CircleShape)
-//                                .size(20.dp)
-//                                .background(Color.Red)
-//                        )
-//                        Spacer(modifier = Modifier.width(5.dp))
-//                        Text(text = item.creatorName)
-//                    }
-//                    Spacer(modifier = Modifier.height(5.dp))
-//                    Text(text = item.startDate)
-//                }
-//            }
-//            Text(text = "XX/YY", modifier = Modifier.align(Alignment.End))
-//        }
-//    }
-//}
+        .border(2.dp, Color.Black, RoundedCornerShape(10.dp))
+        .fillMaxWidth()
+    ) {
+        Column(modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()) {
+            Row {
+                //ImageBox
+                Box(
+                    modifier = Modifier
+                        .size(105.dp)
+                        .background(Color.Red, RoundedCornerShape(10.dp))
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                Column {
+                    Text(
+                        text = item.title
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Row {
+                        Text(text = "От")
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(20.dp)
+                                .background(Color.Red)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(text = "item.creatorName")
+                    }
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "item.startDate")
+                }
+            }
+            Text(text = "XX/YY", modifier = Modifier.align(Alignment.End))
+        }
+    }
+}
+
+@Composable
+private fun BottomBar() {
+    BottomAppBar(modifier = Modifier) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Default.Add, contentDescription = null
+                )
+            }
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Default.Add, contentDescription = null
+                )
+            }
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Default.Add, contentDescription = null
+                )
+            }
+        }
+    }
+}
 //
-//@Composable
-//private fun BottomBar() {
-//    BottomAppBar(modifier = Modifier) {
-//        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-//            IconButton(onClick = { /*TODO*/ }) {
-//                Icon(
-//                    imageVector =
-//                    Icons.Default.Add
-////                    ImageVector.vectorResource(R.drawable.add_fill0_wght400_grad0_opsz24
-//                    , contentDescription = null)
-//            }
-//            IconButton(onClick = { /*TODO*/ }) {
-//                Icon(
-//                    imageVector =
-//                    Icons.Default.Add
-////                    ImageVector.vectorResource(R.drawable.add_fill0_wght400_grad0_opsz24
-//                    , contentDescription = null)
-//            }
-//            IconButton(onClick = { /*TODO*/ }) {
-//                Icon(
-//                    imageVector =
-//                    Icons.Default.Add
-////                    ImageVector.vectorResource(R.drawable.add_fill0_wght400_grad0_opsz24
-//                    , contentDescription = null)
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//private fun FloatingActionButton(
-//    onClick: () -> Unit
-//) {
-//    androidx.compose.material3.FloatingActionButton(onClick = onClick) {
-//        Icon(
-//            imageVector =
-//            Icons.Default.Add
-////                    ImageVector.vectorResource(R.drawable.add_fill0_wght400_grad0_opsz24
-//            , contentDescription = null)
-//    }
-//}
+@Composable
+private fun FAB(
+    onClick: () -> Unit
+) {
+    FloatingActionButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.Default.Add, contentDescription = null)
+    }
+}
+
 //
 //
 //

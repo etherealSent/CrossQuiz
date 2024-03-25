@@ -1,4 +1,4 @@
-package com.example.quiz.android
+package example.quiz.android
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable

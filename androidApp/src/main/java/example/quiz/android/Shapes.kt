@@ -1,4 +1,4 @@
-package com.example.quiz.android
+package example.quiz.android
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

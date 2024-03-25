@@ -6,7 +6,7 @@ plugins {
 
 android {
     compileSdk = 34
-    namespace = "example.todo.android"
+    namespace = "example.quiz.android"
 
     defaultConfig {
         minSdk = 26
@@ -28,6 +28,9 @@ android {
 
 dependencies {
     implementation(project(":shared:database"))
+    implementation(project(":shared:utils"))
+    implementation(project(":shared:root"))
+    implementation(project(":shared:ui"))
     implementation(compose.material)
     implementation(libs.arkivanov.mvikotlin)
     implementation(libs.arkivanov.mvikotlin.main)

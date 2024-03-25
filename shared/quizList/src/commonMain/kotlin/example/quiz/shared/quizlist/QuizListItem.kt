@@ -4,7 +4,7 @@ package example.quiz.shared.quizlist
     public val id: Long,
     public val orderNum: Long,
     public val title: String,
-    public val themeList: String,
+    public val themeList: List<String>,
 )
 
 enum class Setup {
