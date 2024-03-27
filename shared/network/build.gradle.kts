@@ -1,6 +1,7 @@
 plugins {
     id("multiplatform-setup")
     id("android-setup")
+    kotlin("plugin.serialization") version "1.9.21"
 }
 
 android.namespace = "example.quiz.shared.network"
@@ -10,7 +11,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.ktor.client.core)
-                implementation(libs.ktorfit)
+                implementation(libs.ktor.client.serialization)
             }
         }
     }

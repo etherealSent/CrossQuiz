@@ -1,5 +1,3 @@
-package quizresult
-
 sealed interface QuizResultState {
 
     data class Success(val result: QuizResult): QuizResultState

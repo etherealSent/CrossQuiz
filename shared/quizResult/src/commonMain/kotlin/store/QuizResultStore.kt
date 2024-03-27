@@ -1,7 +1,7 @@
-package quizresult.store
+package store
 
 import com.arkivanov.mvikotlin.core.store.Store
-import quizresult.QuizResultState
+import QuizResultState
 
 // executor - бизнес логика
 // reducer - преобразование старого стейта в новый по месседжам

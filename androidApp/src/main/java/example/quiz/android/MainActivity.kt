@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
     private fun quizRoot(componentContext: ComponentContext): QuizRoot =
         QuizRootComponent(
             componentContext = componentContext,
