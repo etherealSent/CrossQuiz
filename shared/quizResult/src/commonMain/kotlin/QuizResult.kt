@@ -1,5 +1,3 @@
-package quizresult
-
 data class QuizResult(
     val currentScore: Int,
     val maxScore: Int,

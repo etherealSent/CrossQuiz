@@ -13,6 +13,9 @@ import example.quiz.common.database.QuizDatabaseDriver
 import example.quiz.shared.root.QuizRoot
 import example.quiz.shared.root.integration.QuizRootComponent
 import example.quiz.shared.ui.QuizRootContent
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +29,13 @@ class MainActivity : ComponentActivity() {
                 QuizRootContent(root)
             }
         }
+
+        startKoin {
+            androidContext(this@MainActivity)
+            androidLogger()
+        }
     }
+
     private fun quizRoot(componentContext: ComponentContext): QuizRoot =
         QuizRootComponent(
             componentContext = componentContext,
