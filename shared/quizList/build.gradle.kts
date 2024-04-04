@@ -10,7 +10,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:utils"))
-                implementation(project(":shared:database"))
+                implementation(project(":shared:database:quizdata"))
+                implementation(project(":shared:database:themedata"))
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.arkivanov.mvikotlin)
                 implementation(libs.arkivanov.mvikotlin.extensions.reaktive)

@@ -3,14 +3,14 @@ package example.quiz.shared.quizlist
 import com.arkivanov.decompose.value.Value
 
 interface QuizList {
+
     val models: Value<Model>
-
-//    fun onItemClicked(id: Long)
-
     fun onAddItemClicked()
 
+    fun onItemDeleteClicked(id: Long)
+
     data class Model(
-        val items: List<QuizListItem>,
+        val items: List<QuizListItem>
     )
 
 }

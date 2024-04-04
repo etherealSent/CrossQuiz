@@ -19,7 +19,8 @@ kotlin {
                 framework {
                     baseName = "Quiz"
                     linkerOpts.add("-lsqlite3")
-                    export(project(":shared:database"))
+                    export(project(":shared:database:quizdata"))
+                    export(project(":shared:database:themedata"))
                     export(project(":shared:quizList"))
 //                    export(project(":common:edit"))
                     export(libs.arkivanov.mvikotlin)
@@ -33,10 +34,9 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-//                implementation(project(":common:utils"))
-                implementation(project(":shared:database"))
+                implementation(project(":shared:database:quizdata"))
+                implementation(project(":shared:database:themedata"))
                 implementation(project(":shared:quizList"))
-//                implementation(project(":common:edit"))
                 api(libs.arkivanov.mvikotlin)
                 api(libs.arkivanov.mvikotlin.main)
                 api(libs.arkivanov.decompose)
@@ -47,7 +47,8 @@ kotlin {
 
         iosMain {
             dependencies {
-                api(project(":shared:database"))
+                api(project(":shared:database:quizdata"))
+                api(project(":shared:database:themedata"))
                 api(project(":shared:quizList"))
 //                api(project(":common:edit"))
                 api(libs.arkivanov.decompose)

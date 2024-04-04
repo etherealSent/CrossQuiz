@@ -5,7 +5,6 @@ import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
-import example.quiz.common.database.DefaultQuizSharedDatabase
 import kotlinx.coroutines.launch
 import quizresult.QuizResultState
 

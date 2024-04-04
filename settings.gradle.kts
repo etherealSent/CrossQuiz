@@ -26,6 +26,8 @@ include(
     ":androidApp",
     ":shared",
     ":shared:database",
+    ":shared:database:quizdata",
+    ":shared:database:themedata",
     ":shared:quizList",
     ":shared:root",
     ":shared:ui",

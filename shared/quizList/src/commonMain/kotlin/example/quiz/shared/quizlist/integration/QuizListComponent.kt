@@ -5,8 +5,8 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import example.quiz.common.database.QuizSharedDatabase
 import example.quiz.common.utils.asValue
+import example.quiz.shared.database.quizdata.QuizSharedDatabase
 import example.quiz.shared.quizlist.QuizList
 import example.quiz.shared.quizlist.store.QuizListStore
 import example.quiz.shared.quizlist.store.QuizListStoreProvider
@@ -15,7 +15,7 @@ class QuizListComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
     database: QuizSharedDatabase,
-) : QuizList, ComponentContext by componentContext{
+) : QuizList, ComponentContext by componentContext {
     private val store =
         instanceKeeper.getStore {
             QuizListStoreProvider(
@@ -30,4 +30,7 @@ class QuizListComponent(
         store.accept(QuizListStore.Intent.AddItem)
     }
 
+    override fun onItemDeleteClicked(id: Long) {
+        store.accept(QuizListStore.Intent.DeleteItem(id = id))
+    }
 }

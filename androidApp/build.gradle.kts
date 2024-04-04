@@ -27,7 +27,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":shared:database"))
+    implementation(project(":shared:database:quizdata"))
+    implementation(project(":shared:database:themedata"))
     implementation(project(":shared:utils"))
     implementation(project(":shared:root"))
     implementation(project(":shared:ui"))
