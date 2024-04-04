@@ -1,0 +1,21 @@
+CREATE TABLE ThemeEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    orderNum INTEGER NOT NULL,
+    title TEXT NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM ThemeEntity;
+
+select:
+SELECT *
+FROM ThemeEntity
+WHERE id = :id;
+
+add:
+INSERT INTO ThemeEntity(orderNum, title)
+VALUES ((CASE (SELECT COUNT(*) FROM ThemeEntity) WHEN 0 THEN 1 ELSE (SELECT MAX(orderNum)+1 FROM ThemeEntity) END), :title);
+
+clear:
+DELETE FROM ThemeEntity;

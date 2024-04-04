@@ -2,12 +2,10 @@ package example.quiz.shared.quizlist.integration
 
 import com.badoo.reaktive.completable.Completable
 import com.badoo.reaktive.observable.Observable
-import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.mapIterable
-import example.quiz.common.database.QuizEntity
-import example.quiz.common.database.QuizSharedDatabase
+import example.quiz.shared.database.quizdata.QuizEntity
+import example.quiz.shared.database.quizdata.QuizSharedDatabase
 import example.quiz.shared.quizlist.QuizListItem
-import example.quiz.shared.quizlist.Setup
 import example.quiz.shared.quizlist.store.QuizListStoreProvider
 
 class QuizListStoreDatabase(
@@ -28,4 +26,7 @@ class QuizListStoreDatabase(
 
     override fun add(title: String, listThemes: String): Completable =
         database.add(title = title, themeList = listThemes)
+
+    override fun delete(id: Long): Completable =
+        database.deleteItem(id = id)
 }

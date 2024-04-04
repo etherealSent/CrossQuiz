@@ -16,12 +16,11 @@ import example.quiz.shared.quizlist.QuizListItem
 import example.quiz.shared.quizlist.Setup
 
 class QuizListStoreProvider(
-    private val storeFactory: StoreFactory,
-    private val database: Database
+    private val storeFactory: StoreFactory, private val database: Database
 ) {
 
-    fun provide(): QuizListStore =
-        object : QuizListStore, Store<QuizListStore.Intent, QuizListStore.State, Nothing> by storeFactory.create(
+    fun provide(): QuizListStore = object : QuizListStore,
+        Store<QuizListStore.Intent, QuizListStore.State, Nothing> by storeFactory.create(
             name = "QuizListStore",
             initialState = QuizListStore.State(),
             bootstrapper = SimpleBootstrapper(Unit),
@@ -31,43 +30,49 @@ class QuizListStoreProvider(
 
     private sealed class Msg {
         data class ItemsLoaded(val items: List<QuizListItem>) : Msg()
+        data class ItemDeleted(val id: Long) : Msg()
+
     }
 
-    private inner class ExecutorImpl : ReaktiveExecutor<QuizListStore.Intent, Unit, QuizListStore.State, Msg, Nothing>() {
+    private inner class ExecutorImpl :
+        ReaktiveExecutor<QuizListStore.Intent, Unit, QuizListStore.State, Msg, Nothing>() {
         override fun executeAction(action: Unit) {
-            database
-                .updates
-                .observeOn(mainScheduler)
-                .map(Msg::ItemsLoaded)
-                .subscribeScoped (onNext = ::dispatch)
+            database.updates.observeOn(mainScheduler).map(Msg::ItemsLoaded)
+                .subscribeScoped(onNext = ::dispatch)
         }
 
         override fun executeIntent(intent: QuizListStore.Intent) {
-            when(intent) {
-                is QuizListStore.Intent.AddItem-> addItem()
+            when (intent) {
+                is QuizListStore.Intent.AddItem -> addItem()
+                is QuizListStore.Intent.DeleteItem -> deleteItem(id = intent.id)
             }
+        }
+
+        private fun deleteItem(id: Long) {
+            dispatch(Msg.ItemDeleted(id = id))
+            database.delete(id = id).subscribeScoped()
         }
 
         private fun addItem() {
-//            val state = state()
             database.add(title = "", listThemes = listOf("").toThemeString()).subscribeScoped()
-            }
-
-        private fun List<String>.toThemeString() =
-            this.joinToString(separator = ",")
         }
+
+        private fun List<String>.toThemeString() = this.joinToString(separator = ",")
+    }
+
     private object ReducerImpl : Reducer<QuizListStore.State, Msg> {
-        override fun QuizListStore.State.reduce(msg: Msg): QuizListStore.State =
-            when(msg) {
-                is Msg.ItemsLoaded -> copy(items = msg.items.sorted())
-            }
-        private fun Iterable<QuizListItem>.sorted(): List<QuizListItem> = sortedByDescending(
-            QuizListItem::orderNum)
+        override fun QuizListStore.State.reduce(msg: Msg): QuizListStore.State = when (msg) {
+            is Msg.ItemsLoaded -> copy(items = msg.items.sorted())
+            is Msg.ItemDeleted -> copy(items = items.filterNot { it.id == msg.id })
+        }
+
+        private fun Iterable<QuizListItem>.sorted(): List<QuizListItem> =
+            sortedByDescending(QuizListItem::orderNum)
     }
 
     interface Database {
         val updates: Observable<List<QuizListItem>>
-
+        fun delete(id: Long): Completable
         fun add(title: String, listThemes: String): Completable
     }
 }

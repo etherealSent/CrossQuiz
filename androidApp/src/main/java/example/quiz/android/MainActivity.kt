@@ -8,8 +8,10 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.timetravel.store.TimeTravelStoreFactory
-import example.quiz.common.database.DefaultQuizSharedDatabase
-import example.quiz.common.database.QuizDatabaseDriver
+import example.quiz.shared.database.quizdata.DefaultQuizSharedDatabase
+import example.quiz.shared.database.quizdata.QuizDatabaseDriver
+import example.quiz.shared.database.themedata.DefaultThemeSharedDatabase
+import example.quiz.shared.database.themedata.ThemeDatabaseDriver
 import example.quiz.shared.root.QuizRoot
 import example.quiz.shared.root.integration.QuizRootComponent
 import example.quiz.shared.ui.QuizRootContent
@@ -40,6 +42,7 @@ class MainActivity : ComponentActivity() {
         QuizRootComponent(
             componentContext = componentContext,
             storeFactory = LoggingStoreFactory(TimeTravelStoreFactory()),
-            database = DefaultQuizSharedDatabase(QuizDatabaseDriver(context = this))
+            quizDatabase = DefaultQuizSharedDatabase(QuizDatabaseDriver(context = this)),
+            themeDatabase = DefaultThemeSharedDatabase(ThemeDatabaseDriver(context = this))
         )
 }
