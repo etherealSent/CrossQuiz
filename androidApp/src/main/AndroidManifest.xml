@@ -9,7 +9,8 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:name=".App"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
     <activity
             android:name="example.quiz.android.MainActivity"
             android:exported="true">
