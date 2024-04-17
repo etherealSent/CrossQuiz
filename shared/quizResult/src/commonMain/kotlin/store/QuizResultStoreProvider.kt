@@ -1,5 +1,6 @@
 package store
 
+import QuizResultState
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
@@ -7,7 +8,6 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import kotlinx.coroutines.launch
 import quizResult.QuizResultRepository
-import QuizResultState
 
 internal class QuizResultStoreProvider(
     private val storeFactory: StoreFactory,

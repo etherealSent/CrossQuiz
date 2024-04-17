@@ -55,3 +55,6 @@ GlobalScope.launch {
         is ApiResponse.Error -> {}
     }
 }
+
+Post запросы
+https://ktor.io/docs/client-requests.html#objects
