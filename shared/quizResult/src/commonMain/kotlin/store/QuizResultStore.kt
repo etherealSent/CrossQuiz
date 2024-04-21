@@ -8,7 +8,7 @@ import QuizResultState
 interface QuizResultStore: Store<QuizResultStore.Intent, QuizResultState, Nothing> {
 
     sealed interface Intent {
-        data object Load: Intent
+        data class Load(val id: String): Intent
         data object FinishQuiz: Intent
         data object SendFeedback: Intent
     }

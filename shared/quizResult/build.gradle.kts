@@ -15,7 +15,7 @@ kotlin {
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.arkivanov.mvikotlin)
                 implementation(libs.arkivanov.mvikotlin.extensions.coroutines)
-                //implementation(libs.kotlinx.coroutines.android)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 
