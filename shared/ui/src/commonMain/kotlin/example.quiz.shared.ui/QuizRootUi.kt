@@ -15,6 +15,12 @@ fun QuizRootContent(component: QuizRoot) {
     ) {
         when (val child = it.instance) {
             is QuizRoot.Child.QuizList -> QuizListContent(child.componentA, child.componentB)
+            is QuizRoot.Child.QuizEdit -> QuizCreateContent(
+                child.componentA,
+                child.componentB,
+                child.componentC,
+                child.componentD
+            )
         }
     }
 }

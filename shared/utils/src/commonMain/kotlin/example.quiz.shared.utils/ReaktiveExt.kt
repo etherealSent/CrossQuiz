@@ -1,4 +1,4 @@
-package example.quiz.common.utils
+package example.quiz.shared.utils
 
 import com.badoo.reaktive.base.Consumer
 

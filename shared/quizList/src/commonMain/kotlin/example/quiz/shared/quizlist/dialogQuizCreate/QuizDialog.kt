@@ -2,6 +2,7 @@ package example.quiz.shared.quizlist.dialogQuizCreate
 
 import com.arkivanov.decompose.value.Value
 import example.quiz.shared.quizlist.QuizListItem
+import example.quiz.shared.quizlist.Setup
 import example.quiz.shared.quizlist.ThemeListItem
 
 interface QuizDialog {
@@ -15,19 +16,21 @@ interface QuizDialog {
 
     fun onNextClicked()
 
+//    fun onSetupChanged(setup: Setup)
+
     fun onInputTitleChanged(title: String)
 
     fun onSearchThemeChanged(search: String)
+
+    fun addTemporaryTheme()
 
     fun addThemeClicked()
 
     fun onThemeClicked(themeId: Long, temporary: Boolean)
 
-    fun addTemporaryTheme()
 
     fun createQuiz()
 
-    fun clearAllThemes()
 
     data class Model(
         val showDialog: Boolean,
@@ -39,4 +42,5 @@ interface QuizDialog {
         val quizItems: List<QuizListItem>,
         val temporaryThemeItems: List<ThemeListItem>
     )
+
 }

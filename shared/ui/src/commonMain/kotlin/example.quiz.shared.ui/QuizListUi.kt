@@ -59,7 +59,7 @@ fun QuizListContent(
             modifier = Modifier.padding(innerPadding),
             list = quizListModel.items,
             themes = quizDialogModel.themeItems,
-            deleteItem = quizListComponent::onItemDeleteClicked
+            onQuizEditClicked = quizListComponent::onQuizClicked
         )
     }
     if (quizDialogModel.showDialog) {
@@ -78,7 +78,7 @@ fun QuizListContent(
             checkedThemes = quizDialogModel.checkedThemeItems,
             temporaryThemes = quizDialogModel.temporaryThemeItems,
             createQuiz = quizDialogComponent::createQuiz,
-            createThemeOfQuiz = quizDialogComponent::addThemeClicked
+            createThemeOfQuiz = quizDialogComponent::addThemeClicked,
         )
     }
 }
@@ -89,7 +89,7 @@ private fun ListItem(
     list: List<QuizListItem>,
     nameOfList: String = "Доступные тесты",
     themes: List<ThemeListItem>,
-    deleteItem: (Long) -> Unit,
+    onQuizEditClicked: (Long, List<String>) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.padding(start = 10.dp, end = 10.dp)) {
         item {
@@ -103,7 +103,7 @@ private fun ListItem(
         items(list) { item ->
             Item(
                 item = item,
-                modifier = Modifier.padding(vertical = 10.dp).clickable { deleteItem(item.id) },
+                modifier = Modifier.padding(vertical = 10.dp).clickable { onQuizEditClicked(item.id, item.themeList) },
                 themes = themes,
                 themeIds = item.themeList
             )
@@ -167,8 +167,10 @@ private fun Item(
                             .clip(RoundedCornerShape(10.dp)).background(Color(0xFFD0BCFF))
                             .padding(5.dp)
                     ) {
-                        Text(text = themes[theme.toInt() - 1].title, fontSize = 14.sp)
-                    }
+                        val themeId = theme.toIntOrNull()
+                        if (themeId != null && themeId > 0 && themeId <= themes.size) {
+                            Text(text = themes[themeId - 1].title, fontSize = 14.sp)
+                        } }
                 }
             }
         }

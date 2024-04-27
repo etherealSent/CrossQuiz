@@ -25,6 +25,7 @@ rootProject.name = "quiz"
 include(
     ":androidApp",
     ":shared",
+    ":shared:quizCreate",
     ":shared:database",
     ":shared:database:quizdata",
     ":shared:database:themedata",

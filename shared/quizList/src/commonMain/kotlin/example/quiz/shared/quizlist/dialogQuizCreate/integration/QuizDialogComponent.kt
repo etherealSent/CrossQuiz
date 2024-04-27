@@ -5,11 +5,14 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
+import com.badoo.reaktive.base.Consumer
+import com.badoo.reaktive.base.invoke
 import com.example.quiz.dialog.store.QuizDialogStore
 import dialog.store.QuizDialogStoreProvider
-import example.quiz.common.utils.asValue
+import example.quiz.shared.utils.asValue
 import example.quiz.shared.database.quizdata.QuizSharedDatabase
 import example.quiz.shared.database.themedata.ThemeSharedDatabase
+import example.quiz.shared.quizlist.QuizListItem
 import example.quiz.shared.quizlist.dialogQuizCreate.QuizDialog
 import example.quiz.shared.quizlist.dialogQuizCreate.integration.QuizDialogStoreQuizDatabase
 import example.quiz.shared.quizlist.dialogQuizCreate.integration.QuizDialogStoreThemeDatabase
@@ -19,7 +22,7 @@ class QuizDialogComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
     quizSharedDatabase: QuizSharedDatabase,
-    themeSharedDatabase: ThemeSharedDatabase
+    themeSharedDatabase: ThemeSharedDatabase,
 ) : QuizDialog, ComponentContext by componentContext {
     private val store = instanceKeeper.getStore {
         QuizDialogStoreProvider(
@@ -70,14 +73,4 @@ class QuizDialogComponent(
     override fun createQuiz() {
         store.accept(QuizDialogStore.Intent.CreateQuiz)
     }
-
-    override fun clearAllThemes() {
-        TODO("Not yet implemented")
-    }
-//    override fun onTemporaryThemeClicked(themeId: Long) {
-//        store.accept()
-//    }
-//    override fun onThemeCreateClicked() {
-//        store.accept()
-//    }
 }

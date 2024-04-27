@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.utils.toSetOrEmpty
+
 plugins {
     id("multiplatform-setup")
     id("android-setup")
@@ -11,6 +13,10 @@ sqldelight {
         create("QuizDatabase") {
             packageName.set("example.quiz.shared.quizdata")
             generateAsync = true
+            version = 1
+//            deriveSchemaFromMigrations = true
+//            migrationOutputDirectory.set(file("src/commonMain/sqldelight/migrations"))
+//            schemaOutputDirectory.set(file("src/commonMain/sqldelight/example/quiz/shared/database/quizdata")) }
         }
     }
 }

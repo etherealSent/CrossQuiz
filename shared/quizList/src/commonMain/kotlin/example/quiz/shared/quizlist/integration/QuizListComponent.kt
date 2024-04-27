@@ -5,16 +5,18 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import example.quiz.common.utils.asValue
+import com.badoo.reaktive.base.Consumer
+import com.badoo.reaktive.base.invoke
+import example.quiz.shared.utils.asValue
 import example.quiz.shared.database.quizdata.QuizSharedDatabase
 import example.quiz.shared.quizlist.QuizList
-import example.quiz.shared.quizlist.store.QuizListStore
 import example.quiz.shared.quizlist.store.QuizListStoreProvider
 
 class QuizListComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
     database: QuizSharedDatabase,
+    private val output: Consumer<QuizList.Output>
 ) : QuizList, ComponentContext by componentContext {
     private val store =
         instanceKeeper.getStore {
@@ -26,11 +28,8 @@ class QuizListComponent(
 
     override val models: Value<QuizList.Model> = store.asValue().map(stateToModel)
 
-    override fun onAddItemClicked() {
-        store.accept(QuizListStore.Intent.AddItem)
+    override fun onQuizClicked(quizItemId: Long, themeList: List<String>) {
+        output(QuizList.Output.EditQuiz(quizItemId, themeList))
     }
 
-    override fun onItemDeleteClicked(id: Long) {
-        store.accept(QuizListStore.Intent.DeleteItem(id = id))
-    }
 }

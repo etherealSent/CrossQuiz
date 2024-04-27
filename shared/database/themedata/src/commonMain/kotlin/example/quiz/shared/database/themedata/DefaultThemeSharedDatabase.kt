@@ -47,6 +47,11 @@ class DefaultThemeSharedDatabase(driver: Single<SqlDriver>) : ThemeSharedDatabas
         query(ThemeDatabaseQueries::selectAll)
             .observe { it.awaitAsList() }
 
+    override fun selectById(listId: List<Long>): Maybe<List<ThemeEntity>> =
+        query { it.selectById(listId) }
+            .flatMapMaybe { maybeFromCoroutine { it.awaitAsList() } }
+
+
     override fun add(title: String): Completable =
         execute { it.add(title = title) }
 
