@@ -11,6 +11,7 @@ kotlin {
             dependencies {
                 implementation(project(":shared:quizList"))
                 implementation(project(":shared:quizResult"))
+                implementation(project(":shared:quizSolve"))
                 implementation(project(":shared:root"))
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.arkivanov.decompose.extensions.compose)
