@@ -1,6 +1,7 @@
 import io.ktor.client.HttpClient
 
-// expect val apiClient: HttpClient
+
+val apiClient: HttpClient
 
 /*
 Client example

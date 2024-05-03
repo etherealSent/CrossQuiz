@@ -8,6 +8,8 @@ interface ThemeSharedDatabase {
 
     fun observeAll(): Observable<List<ThemeEntity>>
 
+    fun selectById(listId: List<Long>): Maybe<List<ThemeEntity>>
+
     fun select(id: Long): Maybe<ThemeEntity>
 
     fun add(title: String): Completable

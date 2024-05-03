@@ -13,6 +13,11 @@ SELECT *
 FROM ThemeEntity
 WHERE id = :id;
 
+selectById:
+SELECT *
+FROM ThemeEntity
+WHERE id IN :listId;
+
 add:
 INSERT INTO ThemeEntity(orderNum, title)
 VALUES ((CASE (SELECT COUNT(*) FROM ThemeEntity) WHEN 0 THEN 1 ELSE (SELECT MAX(orderNum)+1 FROM ThemeEntity) END), :title);

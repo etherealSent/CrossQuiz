@@ -1,4 +1,4 @@
-package example.quiz.common.utils
+package example.quiz.shared.utils
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate

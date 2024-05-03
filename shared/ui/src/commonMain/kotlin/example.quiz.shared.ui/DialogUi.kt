@@ -64,14 +64,17 @@ fun DialogContent(
     addTemporaryTheme: () -> Unit,
     checkedThemes: List<ThemeListItem>,
     onThemeChecked: (Long, Boolean) -> Unit,
-    temporaryThemes: List<ThemeListItem>
+    temporaryThemes: List<ThemeListItem>,
 ) {
+
+    // init dialogItems in Dialog component
     val dialogItems = listOf<QuizDialogItem>(
         QuizDialogItem(0, DialogType.PickBase),
         QuizDialogItem(1, DialogType.PickName),
         QuizDialogItem(2, DialogType.PickThemes)
     )
 
+    // add field to Dialog component
     val currentDialogType = dialogItems[currentDialogId.toInt()].dialogType
 
     Dialog(onDismissRequest = onDismissRequest) {
@@ -208,11 +211,11 @@ fun PickThemesDialog(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    if (search.isNotEmpty()) {
+//    if (search.isNotEmpty()) {
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
         }
-    }
+//    }
 
     Column {
         Text(
@@ -235,7 +238,7 @@ fun PickThemesDialog(
             }),
             placeholder = { Text(text = "Введите название") },
             label = { Text(text = "Введите название") })
-        if (themesOfTests.isEmpty() or ((themesOfTests.filter {
+        if ((themesOfTests.isEmpty() and temporaryThemes.isEmpty() and search.isNotEmpty()) or ((themesOfTests.filter {
                 it.title.equals(
                     search, ignoreCase = true
                 )
@@ -251,7 +254,7 @@ fun PickThemesDialog(
                     .clip(RoundedCornerShape(10.dp)).background(color = Color(0xFFE5E5E5))
             )
         }
-        if (!filteredThemes.isEmpty()) {
+        if (filteredThemes.isNotEmpty() or temporaryThemes.isNotEmpty()) {
             Column(
                 modifier = Modifier.padding(horizontal = 10.dp).clip(RoundedCornerShape(10.dp))
                     .background(color = Color(0xFFE5E5E5))
@@ -309,7 +312,7 @@ fun PickThemesDialog(
 fun ItemOfList(
     modifier: Modifier = Modifier, themeQuiz: String, checked: Boolean, onCheckedChange: () -> Unit
 ) {
-    ListItem(modifier = modifier.fillMaxWidth().clickable { onCheckedChange() },
+    ListItem(modifier = modifier.background(Color(0xFFF3EDF7)).fillMaxWidth().clickable { onCheckedChange() },
         text = { Text(text = themeQuiz) },
         trailing = { Checkbox(checked = checked, onCheckedChange = { onCheckedChange() }) })
 }
@@ -320,7 +323,7 @@ fun CreateItemOfList(
     createThemeOfQuiz: () -> Unit, text: String, modifier: Modifier = Modifier
 ) {
     ListItem(
-        modifier = modifier.fillMaxWidth().clickable { createThemeOfQuiz() },
+        modifier = modifier.background(Color(0xFFF3EDF7)).fillMaxWidth().clickable { createThemeOfQuiz() },
         text = { Text(text = "Создать " + text) },
 //        leadingContent = { Icon(imageVector = Icons.Default.Add, contentDescription = null) }
     )

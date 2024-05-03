@@ -13,3 +13,4 @@ interface QuizListStore : Store<QuizListStore.Intent, QuizListStore.State, Nothi
         val items: List<QuizListItem> = emptyList()
     )
 }
+

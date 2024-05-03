@@ -5,12 +5,17 @@ import com.arkivanov.decompose.value.Value
 interface QuizList {
 
     val models: Value<Model>
-    fun onAddItemClicked()
 
-    fun onItemDeleteClicked(id: Long)
+    fun onQuizClicked(quizItemId: Long, themeList: List<String>)
+
 
     data class Model(
         val items: List<QuizListItem>
     )
 
+    sealed class Output {
+        data class EditQuiz(val itemId: Long, val themeList: List<String>) : Output()
+    }
+
 }
+

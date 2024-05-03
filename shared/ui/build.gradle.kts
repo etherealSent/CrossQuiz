@@ -10,6 +10,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:quizList"))
+                implementation(project(":shared:quizCreate"))
                 implementation(project(":shared:quizResult"))
                 implementation(project(":shared:quizSolve"))
                 implementation(project(":shared:root"))

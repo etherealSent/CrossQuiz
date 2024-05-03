@@ -202,20 +202,6 @@ class QuizDialogStoreProvider(
             }
         }
 
-
-//        private inline fun QuizDialogStore.State.update(id: Long, func: QuizListItem.() -> QuizListItem): QuizDialogStore.State {
-//            val quizListItem = quizItem.find { it.id == id } ?: return this
-//
-//            return put(quizListItem.func())
-//        }
-//
-//        private fun QuizDialogStore.State.put(quiz: QuizListItem): QuizDialogStore.State {
-//            val oldQuizes = quizItem.associateByTo(mutableMapOf(), QuizListItem::id)
-//            val oldQuiz: QuizListItem? = oldQuizes.put(quiz.id, quiz)
-//
-//            return copy(quizItem = if (oldQuiz?.orderNum == quiz.orderNum) oldQuizes.values.toList() else oldQuizes.values.sorted())
-//        }
-
         private fun Iterable<ThemeListItem>.sorted(): List<ThemeListItem> =
             sortedByDescending(ThemeListItem::orderNum)
     }

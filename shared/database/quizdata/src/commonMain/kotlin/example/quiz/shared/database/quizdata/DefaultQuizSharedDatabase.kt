@@ -6,11 +6,16 @@ import app.cash.sqldelight.db.SqlDriver
 import com.badoo.reaktive.base.setCancellable
 import com.badoo.reaktive.completable.Completable
 import com.badoo.reaktive.coroutinesinterop.completableFromCoroutine
+import com.badoo.reaktive.coroutinesinterop.maybeFromCoroutine
 import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
+import com.badoo.reaktive.maybe.Maybe
+import com.badoo.reaktive.maybe.map
+import com.badoo.reaktive.maybe.mapNotNull
 import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.observable.autoConnect
 import com.badoo.reaktive.observable.firstOrError
 import com.badoo.reaktive.observable.flatMapSingle
+import com.badoo.reaktive.observable.mapNotNull
 import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.observeOn
 import com.badoo.reaktive.observable.replay
@@ -18,8 +23,10 @@ import com.badoo.reaktive.scheduler.ioScheduler
 import com.badoo.reaktive.single.Single
 import com.badoo.reaktive.single.asObservable
 import com.badoo.reaktive.single.flatMapCompletable
+import com.badoo.reaktive.single.flatMapMaybe
 import com.badoo.reaktive.single.flatMapObservable
 import com.badoo.reaktive.single.map
+import com.badoo.reaktive.single.mapNotNull
 import com.badoo.reaktive.single.observeOn
 import com.badoo.reaktive.single.singleOf
 import example.quiz.shared.quizdata.QuizDatabase
@@ -39,15 +46,24 @@ class DefaultQuizSharedDatabase(driver: Single<SqlDriver>) : QuizSharedDatabase 
             .autoConnect()
             .firstOrError()
 
+
     override fun observeAll(): Observable<List<QuizEntity>> =
         query(QuizDatabaseQueries::selectAll)
             .observe { it.awaitAsList() }
+
+    override fun select(id: Long): Maybe<QuizEntity> =
+        query { it.select(id = id) }
+            .flatMapMaybe { maybeFromCoroutine { it.awaitAsList() } }
+            .mapNotNull { it.firstOrNull() }
 
     override fun add(title: String, themeList: String): Completable =
         execute { it.add(title = title, themeList = themeList) }
 
     override fun setTitle(id: Long, title: String): Completable =
         execute { it.setTitle(id = id, title = title) }
+
+    override fun setDescription(id: Long, description: String): Completable =
+        execute { it.setDescription(id = id, description = description) }
 
     override fun setThemeList(id: Long, themeList: String): Completable =
         execute { it.setThemeList(id = id, themeList = themeList) }
@@ -57,7 +73,6 @@ class DefaultQuizSharedDatabase(driver: Single<SqlDriver>) : QuizSharedDatabase 
 
     override fun deleteItem(id: Long): Completable =
         execute { it.delete(id = id) }
-
 
     private fun <T : Any> query(query: (QuizDatabaseQueries) -> Query<T>): Single<Query<T>> =
         queries
