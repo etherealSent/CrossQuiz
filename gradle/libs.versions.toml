@@ -32,6 +32,7 @@ kotlin-test-annotations-common = { module = "org.jetbrains.kotlin:kotlin-test-an
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 compose-gradle-plugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 
 # Android libraries
 android-tools-build-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-tools-build-gradle" }

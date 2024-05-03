@@ -32,10 +32,11 @@ internal class QuizSolveStoreProvider(
     private inner class ExecutorImpl :
         CoroutineExecutor<QuizSolveStore.Intent, Unit, QuizSolveState, Msg, Nothing>() {
         override fun executeIntent(intent: QuizSolveStore.Intent) {
-            val currentQuestion = state().currentQuestion
+            val solveState = state() as? QuizSolveState.QuizSolve ?: return
+            val currentQuestion = solveState.currentQuestion
             return when (intent) {
                 is QuizSolveStore.Intent.AnswerClick -> {
-                    val currentChosenAnswers = state().currentChosenAnswers
+                    val currentChosenAnswers = solveState.currentChosenAnswers
                     val answers = if (currentQuestion is Question.Single) {
                         if (currentChosenAnswers.contains(intent.answer)) {
                             listOf()
@@ -53,12 +54,12 @@ internal class QuizSolveStoreProvider(
                 }
 
                 is QuizSolveStore.Intent.NextQuestion -> {
-                    if (currentQuestion == state().quiz.questions.last()) {
+                    if (currentQuestion == solveState.quiz.questions.last()) {
                         // Open next screen + send data to backend
                     } else {
                         val currentQuestionId =
-                            state().quiz.questions.indexOf(currentQuestion)
-                        dispatch(Msg.QuestionChanged(state().quiz.questions[currentQuestionId + 1]))
+                            solveState.quiz.questions.indexOf(currentQuestion)
+                        dispatch(Msg.QuestionChanged(solveState.quiz.questions[currentQuestionId + 1]))
                         // save question in map
                     }
                 }
@@ -70,9 +71,17 @@ internal class QuizSolveStoreProvider(
 
         override fun QuizSolveState.reduce(msg: Msg): QuizSolveState {
             return when (msg) {
-                is Msg.AnswersChanged -> copy(currentChosenAnswers = msg.answers)
+                is Msg.AnswersChanged -> {
+                    when (this) {
+                        is QuizSolveState.QuizSolve -> copy(currentChosenAnswers = msg.answers)
+                        is QuizSolveState.Initial -> this
+                    }
+                }
                 is Msg.QuestionChanged -> {
-                    copy(currentQuestion = msg.question)
+                    when (this) {
+                        is QuizSolveState.QuizSolve -> copy(currentQuestion = msg.question)
+                        is QuizSolveState.Initial -> this
+                    }
                 }
             }
         }
