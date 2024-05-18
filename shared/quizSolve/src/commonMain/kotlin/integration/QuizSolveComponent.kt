@@ -12,4 +12,8 @@ interface QuizSolveComponent {
     fun onAnswerClick(answer: Answer)
 
     fun onNextClick()
+
+    fun onReloadClick()
+
+    fun onQuizStart()
 }

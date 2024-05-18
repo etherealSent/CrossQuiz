@@ -1,5 +1,5 @@
 // TODO ELDAR REMOVE IMAGE SUPPORT
-data class Quiz(
+data class QuizModel(
     val id: String,
     val questions: List<Question>,
 )
@@ -17,12 +17,12 @@ sealed interface Question {
         override val answers: List<Answer>,
     ) : Question
 
-    data class Multiple(
-        override val id: String,
-        override val questionNumber: String,
-        override val questionText: String,
-        override val answers: List<Answer>,
-    ) : Question
+//    data class Multiple(
+//        override val id: String,
+//        override val questionNumber: String,
+//        override val questionText: String,
+//        override val answers: List<Answer>,
+//    ) : Question
 }
 
 //sealed interface Answers {

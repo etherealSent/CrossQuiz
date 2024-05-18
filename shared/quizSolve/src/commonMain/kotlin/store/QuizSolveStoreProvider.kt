@@ -1,16 +1,25 @@
 package store
 
 import Answer
+import ApiResponse
 import Question
+import QuizModel
+import QuizSolveMapper
 import QuizSolveState
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.SimpleBootstrapper
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import quizSolve.QuizSolveRepository
 
 internal class QuizSolveStoreProvider(
     private val storeFactory: StoreFactory,
+    private val quizSolveRepository: QuizSolveRepository,
+    private val mapper: QuizSolveMapper,
 ) {
 
     fun provide(initialState: QuizSolveState): QuizSolveStore =
@@ -24,43 +33,65 @@ internal class QuizSolveStoreProvider(
             ) {}
 
     private sealed class Msg {
-        // TODO use database?
-        data class AnswersChanged(val answers: List<Answer>) : Msg()
-        data class QuestionChanged(val question: Question) : Msg()
+        data class AnswersChanged(val answers: Answer) : Msg()
+        data class QuestionChanged(val question: Question, val answer: Answer) : Msg()
+        data class QuizLoaded(val quiz: QuizModel?) : Msg()
     }
 
     private inner class ExecutorImpl :
         CoroutineExecutor<QuizSolveStore.Intent, Unit, QuizSolveState, Msg, Nothing>() {
         override fun executeIntent(intent: QuizSolveStore.Intent) {
-            val solveState = state() as? QuizSolveState.QuizSolve ?: return
-            val currentQuestion = solveState.currentQuestion
-            return when (intent) {
-                is QuizSolveStore.Intent.AnswerClick -> {
-                    val currentChosenAnswers = solveState.currentChosenAnswers
-                    val answers = if (currentQuestion is Question.Single) {
-                        if (currentChosenAnswers.contains(intent.answer)) {
-                            listOf()
-                        } else {
-                            listOf(intent.answer)
+            when (intent) {
+                is QuizSolveStore.Intent.QuizSolveIntent -> {
+                    val solveState = state() as? QuizSolveState.QuizSolve ?: return
+                    val currentQuestion = solveState.currentQuestion
+                    when (intent) {
+                        is QuizSolveStore.Intent.QuizSolveIntent.AnswerClick -> {
+//                            val currentChosenAnswers = solveState.currentChosenAnswer
+//                            val answers = if (currentQuestion is Question.Single) {
+//                                if (currentChosenAnswers.contains(intent.answer)) {
+//                                    listOf()
+//                                } else {
+//                                    listOf(intent.answer)
+//                                }
+//                            } else {
+//                                if (currentChosenAnswers.contains(intent.answer)) {
+//                                    currentChosenAnswers.filter { it == intent.answer }
+//                                } else {
+//                                    currentChosenAnswers + intent.answer
+//                                }
+//                            }
+                            dispatch(Msg.AnswersChanged(intent.answer))
                         }
-                    } else {
-                        if (currentChosenAnswers.contains(intent.answer)) {
-                            currentChosenAnswers.filter { it == intent.answer }
-                        } else {
-                            currentChosenAnswers + intent.answer
+
+                        is QuizSolveStore.Intent.QuizSolveIntent.NextQuestion -> {
+                            if (currentQuestion == solveState.quiz.questions.last()) {
+                                // Open next screen + send data to backend
+                            } else {
+//                                dispatch(Msg.QuestionChanged(
+//                                    intent.answer))
+//                                val currentQuestionId =
+//                                    solveState.quiz.questions.indexOf(currentQuestion)
+//                                dispatch(Msg.QuestionChanged(solveState.quiz.questions[currentQuestionId + 1]))
+                                // save question in map
+                            }
                         }
+
                     }
-                    dispatch(Msg.AnswersChanged(answers))
                 }
 
-                is QuizSolveStore.Intent.NextQuestion -> {
-                    if (currentQuestion == solveState.quiz.questions.last()) {
-                        // Open next screen + send data to backend
-                    } else {
-                        val currentQuestionId =
-                            solveState.quiz.questions.indexOf(currentQuestion)
-                        dispatch(Msg.QuestionChanged(solveState.quiz.questions[currentQuestionId + 1]))
-                        // save question in map
+                // +
+                is QuizSolveStore.Intent.LoadQuiz -> {
+                    scope.launch {
+                        val response = withContext(Dispatchers.Default) {
+                            quizSolveRepository.getQuizById(intent.id)
+                        }
+                        val result = when (response) {
+                            is ApiResponse.Success -> response.body
+                            is ApiResponse.Error -> null
+                        }
+                        val quiz = mapper.mapToQuiz(result)
+                        dispatch(Msg.QuizLoaded(quiz))
                     }
                 }
             }
@@ -73,14 +104,29 @@ internal class QuizSolveStoreProvider(
             return when (msg) {
                 is Msg.AnswersChanged -> {
                     when (this) {
-                        is QuizSolveState.QuizSolve -> copy(currentChosenAnswers = msg.answers)
-                        is QuizSolveState.Initial -> this
+                        is QuizSolveState.QuizSolve -> copy(currentChosenAnswer = msg.answers)
+                        is QuizSolveState.Loading -> this
+                        is QuizSolveState.Error -> this
                     }
                 }
                 is Msg.QuestionChanged -> {
                     when (this) {
                         is QuizSolveState.QuizSolve -> copy(currentQuestion = msg.question)
-                        is QuizSolveState.Initial -> this
+                        is QuizSolveState.Loading -> this
+                        is QuizSolveState.Error -> this
+                    }
+                }
+                is Msg.QuizLoaded -> {
+                    val quiz = msg.quiz
+                    if (quiz != null) {
+                        QuizSolveState.QuizSolve(
+                            quiz = quiz,
+                            currentQuestion = quiz.questions.first(),
+                            currentChosenAnswer = null,
+                            chosenAnswers = hashMapOf(),
+                        )
+                    } else {
+                        QuizSolveState.Error
                     }
                 }
             }

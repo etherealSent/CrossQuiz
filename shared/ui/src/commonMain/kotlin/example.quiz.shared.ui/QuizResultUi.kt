@@ -277,7 +277,7 @@ private fun MultiStyleTextBottomResult(
 }
 
 @Composable
-private fun DefaultButton(
+internal fun DefaultButton(
     modifier: Modifier,
     content: @Composable () -> Unit,
     onClick: () -> Unit

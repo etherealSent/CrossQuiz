@@ -1,11 +1,14 @@
 
 sealed interface QuizSolveState {
     data class QuizSolve(
-        val quiz: Quiz,
+        val quiz: QuizModel,
         val currentQuestion: Question,
-        val currentChosenAnswers: List<Answer>,
-        val chosenAnswers: HashMap<Question, List<Answer>>,
+        val currentChosenAnswer: Answer?,
+        val chosenAnswers: HashMap<Question, Answer>,
+        val isStarted: Boolean = false,
     ): QuizSolveState
 
-    data object Initial: QuizSolveState
+    data object Loading: QuizSolveState
+
+    data object Error: QuizSolveState
 }

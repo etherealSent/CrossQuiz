@@ -11,6 +11,7 @@ kotlin {
             dependencies {
 //                implementation(project(":shared:utils"))
 //                implementation(project(":shared:database:quizdatabase"))
+                implementation(project(":shared:network"))
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.arkivanov.mvikotlin)
                 implementation(libs.arkivanov.mvikotlin.extensions.reaktive)

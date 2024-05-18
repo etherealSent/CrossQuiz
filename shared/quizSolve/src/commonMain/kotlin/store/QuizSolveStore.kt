@@ -7,8 +7,15 @@ import com.arkivanov.mvikotlin.core.store.Store
 interface QuizSolveStore : Store<QuizSolveStore.Intent, QuizSolveState, Nothing> {
 
     sealed interface Intent {
-        data object NextQuestion : Intent
 
-        data class AnswerClick(val answer: Answer) : Intent
+        sealed interface QuizSolveIntent : Intent {
+
+            data object NextQuestion : QuizSolveIntent
+
+            data class AnswerClick(val answer: Answer) : QuizSolveIntent
+
+        }
+
+        data class LoadQuiz(val id: Int) : Intent
     }
 }

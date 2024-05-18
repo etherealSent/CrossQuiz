@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.LinearProgressIndicator
@@ -52,31 +54,91 @@ private fun questionNumberText(number: String) = "Вопрос $number"
 // TODO ELDAR colors and paddings in separate theme file
 @Composable
 fun QuizSolveScreen(component: QuizSolveComponent) {
-    val currentQuestion by component.state.collectAsState(Dispatchers.Main.immediate)
-    if (currentQuestion is QuizSolveState.QuizSolve) {
-        Surface {
-            Scaffold(
-                topBar = {
-                    // TODO ELDAR handle it in component
-                    ProgressBar(
-                        progress = 0.5f, modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp, horizontal = 8.dp)
-                    )
-                },
-                content = {
-                    MainContent(
-                        question = (currentQuestion as QuizSolveState.QuizSolve).currentQuestion,
-                        modifier = Modifier.padding(it)
-                    )
-                },
-                bottomBar = {
-                    BottomNavigation(
-                        onNextButtonClick = { component.onNextClick() },
-                        // TODO ELDAR handle it in component
-                        isEnabled = true,
+    val state by component.state.collectAsState(Dispatchers.Main.immediate)
+    when (state) {
+        is QuizSolveState.Loading -> {
+            Loading(modifier = Modifier)
+        }
+        is QuizSolveState.Error -> {
+            Error { component.onReloadClick() }
+        }
+        is QuizSolveState.QuizSolve -> {
+            val quizState = state as QuizSolveState.QuizSolve
+            if (quizState.isStarted) {
+                Surface {
+                    Scaffold(
+                        topBar = {
+                            // TODO ELDAR handle it in component
+                            ProgressBar(
+                                progress = 0.5f, modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp, horizontal = 8.dp)
+                            )
+                        },
+                        content = {
+                            MainContent(
+                                question = quizState.currentQuestion,
+                                modifier = Modifier.padding(it)
+                            )
+                        },
+                        bottomBar = {
+                            BottomNavigation(
+                                onNextButtonClick = { component.onNextClick() },
+                                // TODO ELDAR handle it in component
+                                isEnabled = true,
+                            )
+                        }
                     )
                 }
+            } else {
+                // TODO вьюха перед началом теста
+                Surface {
+                    Scaffold(
+                        content = {
+                            MainContent(
+                                question = quizState.currentQuestion,
+                                modifier = Modifier.padding(it)
+                            )
+                        },
+                        bottomBar = {
+                            BottomNavigation(
+                                onNextButtonClick = { component.onNextClick() },
+                                isEnabled = true,
+                            )
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Loading(modifier: Modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+    }
+}
+
+@Composable
+private fun Error(
+    onRetryClick: () -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.align(Alignment.Center)) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Произошла ошибка, попробуйте снова",
+                textAlign = TextAlign.Center,
+            )
+            DefaultButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp, top = 0.dp),
+                content = {
+                    Text(text = "Reload")
+                },
+                onClick = onRetryClick,
             )
         }
     }
@@ -97,7 +159,7 @@ private fun MainContent(
         Spacer(modifier = Modifier.height(16.dp))
         when (question) {
             is Question.Single -> SingleAnswerList(answers = question.answers)
-            is Question.Multiple -> MultipleAnswerList(answers = question.answers)
+            //is Question.Multiple -> MultipleAnswerList(answers = question.answers)
         }
     }
 }
