@@ -3,7 +3,7 @@ package quizList.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-// TODO
-data class QuizList(
-    val id: String
+data class QuizListRequest(
+    val subject_id: Int,
+    val theme_id: Int,
 )
