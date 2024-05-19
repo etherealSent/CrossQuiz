@@ -6,7 +6,7 @@ interface QuizList {
 
     val models: Value<Model>
 
-    fun onQuizClicked(quizItemId: Long, themeList: List<String>)
+    fun onQuizClicked(quizItemId: Long, themeList: List<Long>)
 
 
     data class Model(
@@ -14,7 +14,7 @@ interface QuizList {
     )
 
     sealed class Output {
-        data class EditQuiz(val itemId: Long, val themeList: List<String>) : Output()
+        data class EditQuiz(val itemId: Long, val themeList: List<Long>) : Output()
     }
 
 }

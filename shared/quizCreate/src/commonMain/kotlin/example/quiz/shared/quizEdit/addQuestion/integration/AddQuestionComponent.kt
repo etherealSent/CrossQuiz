@@ -8,9 +8,6 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import example.quiz.shared.quizEdit.addQuestion.AddQuestion
 import example.quiz.shared.quizEdit.addQuestion.store.AddQuestionStore
 import example.quiz.shared.quizEdit.addQuestion.store.AddQuestionStoreProvider
-import example.quiz.shared.quizEdit.question.store.QuestionStore
-import example.quiz.shared.quizEdit.question.store.QuestionStoreProvider
-import example.quiz.shared.quizlist.QuestionItem
 import example.quiz.shared.quizlist.QuestionType
 import example.quiz.shared.utils.asValue
 

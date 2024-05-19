@@ -12,8 +12,6 @@ internal val stateToModel: (QuizEditStore.State) -> QuizEdit.Model =
             themeList = it.themeList,
             setup = it.setup,
             description = it.description,
-            questionItems = it.questionItems,
-            selectedQuestionId = it.selectedQuestionId,
-            showMoreVertMenu = it.showMoreVertMenu
+            showMoreVertMenu = it.showMoreVertMenu,
         )
     }

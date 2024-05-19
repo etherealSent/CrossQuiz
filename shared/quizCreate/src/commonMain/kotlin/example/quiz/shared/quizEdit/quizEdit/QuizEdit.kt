@@ -1,7 +1,8 @@
 package example.quiz.shared.quizEdit.quizEdit
 
 import com.arkivanov.decompose.value.Value
-import example.quiz.shared.quizlist.QuestionItem
+import example.quiz.shared.quizlist.Question
+import example.quiz.shared.quizlist.QuestionType
 import example.quiz.shared.quizlist.Setup
 
 interface QuizEdit {
@@ -16,8 +17,6 @@ interface QuizEdit {
         val title: String = "",
         val description: String = "",
         val themeList: List<String> = listOf(),
-        val questionItems: List<QuestionItem> = listOf(),
-        val selectedQuestionId: Long = 0L,
         val showMoreVertMenu: Boolean = false
     )
     fun onBackClicked()

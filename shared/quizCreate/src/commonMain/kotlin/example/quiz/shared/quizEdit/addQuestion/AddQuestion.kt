@@ -1,7 +1,6 @@
 package example.quiz.shared.quizEdit.addQuestion
 
 import com.arkivanov.decompose.value.Value
-import example.quiz.shared.quizlist.QuestionItem
 import example.quiz.shared.quizlist.QuestionType
 
 interface AddQuestion {
@@ -10,7 +9,6 @@ interface AddQuestion {
     data class Model(
         val showDialog: Boolean,
         val questionType: QuestionType,
-        val question: QuestionItem,
         val questionTypes: List<QuestionType>
     )
 

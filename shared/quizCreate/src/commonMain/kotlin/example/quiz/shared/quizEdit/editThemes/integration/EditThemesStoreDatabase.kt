@@ -3,7 +3,9 @@ package example.quiz.shared.quizEdit.editThemes.integration
 import com.badoo.reaktive.completable.Completable
 import com.badoo.reaktive.maybe.Maybe
 import com.badoo.reaktive.maybe.blockingGet
+import com.badoo.reaktive.maybe.flatMap
 import com.badoo.reaktive.maybe.map
+import com.badoo.reaktive.maybe.mapIterable
 import com.badoo.reaktive.maybe.toMaybe
 import com.badoo.reaktive.observable.Observable
 import com.badoo.reaktive.observable.map
@@ -11,6 +13,7 @@ import com.badoo.reaktive.observable.mapIterable
 import example.quiz.shared.database.themedata.ThemeEntity
 import example.quiz.shared.database.themedata.ThemeSharedDatabase
 import example.quiz.shared.quizEdit.editThemes.store.EditThemesStoreProvider
+import example.quiz.shared.quizlist.QuizListItem
 import example.quiz.shared.quizlist.ThemeListItem
 import kotlinx.coroutines.selects.select
 
@@ -21,7 +24,6 @@ class EditThemesStoreDatabase(
         database
             .observeAll()
             .mapIterable { it.toItem() }
-
 
     private fun ThemeEntity.toItem(): ThemeListItem =
         ThemeListItem(

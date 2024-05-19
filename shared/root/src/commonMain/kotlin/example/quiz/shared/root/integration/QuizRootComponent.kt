@@ -14,7 +14,7 @@ import example.quiz.shared.database.quizdata.QuizSharedDatabase
 import example.quiz.shared.database.themedata.ThemeSharedDatabase
 import example.quiz.shared.quizEdit.addQuestion.integration.AddQuestionComponent
 import example.quiz.shared.quizEdit.editThemes.integration.EditThemesComponent
-import example.quiz.shared.quizEdit.question.integration.QuestionComponent
+import example.quiz.shared.quizEdit.questions.integration.QuestionsComponent
 import example.quiz.shared.quizEdit.quizEdit.QuizEdit
 import example.quiz.shared.quizEdit.quizEdit.integration.QuizEditComponent
 import example.quiz.shared.quizlist.QuizList
@@ -27,9 +27,9 @@ class QuizRootComponent internal constructor(
     private val quizList: (ComponentContext, Consumer<QuizList.Output>) -> QuizListComponent,
     private val dialog: (ComponentContext) -> QuizDialogComponent,
     private val quizEdit: (ComponentContext, itemId: Long, Consumer<QuizEdit.Output>) -> QuizEditComponent,
-    private val question: (ComponentContext) -> QuestionComponent,
+    private val question: (ComponentContext) -> QuestionsComponent,
     private val addQuestion: (ComponentContext) -> AddQuestionComponent,
-    private val editThemes: (ComponentContext, themeList: List<String>) -> EditThemesComponent
+    private val editThemes: (ComponentContext, themeList: List<Long>) -> EditThemesComponent
 ) : QuizRoot, ComponentContext by componentContext {
 
     constructor(
@@ -65,7 +65,7 @@ class QuizRootComponent internal constructor(
             )
         },
         question = { childContext ->
-          QuestionComponent(
+          QuestionsComponent(
               componentContext = componentContext,
               storeFactory = storeFactory,
           )
@@ -135,7 +135,7 @@ class QuizRootComponent internal constructor(
         @Serializable
         data object QuizList : Configuration()
         @Serializable
-        data class QuizCreate(val itemId: Long, val themeList: List<String>) : Configuration()
+        data class QuizCreate(val itemId: Long, val themeList: List<Long>) : Configuration()
     }
 }
 

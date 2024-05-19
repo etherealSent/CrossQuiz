@@ -89,7 +89,7 @@ private fun ListItem(
     list: List<QuizListItem>,
     nameOfList: String = "Доступные тесты",
     themes: List<ThemeListItem>,
-    onQuizEditClicked: (Long, List<String>) -> Unit,
+    onQuizEditClicked: (Long, List<Long>) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.padding(start = 10.dp, end = 10.dp)) {
         item {
@@ -103,7 +103,7 @@ private fun ListItem(
         items(list) { item ->
             Item(
                 item = item,
-                modifier = Modifier.padding(vertical = 10.dp).clickable { onQuizEditClicked(item.id, item.themeList) },
+                modifier = Modifier.padding(vertical = 10.dp).clickable { onQuizEditClicked(item.id, item.themeList.map { it.toLong() }) },
                 themes = themes,
                 themeIds = item.themeList
             )

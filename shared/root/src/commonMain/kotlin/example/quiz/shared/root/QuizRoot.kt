@@ -5,7 +5,7 @@ import com.arkivanov.decompose.value.Value
 import com.example.quiz.dialog.integration.QuizDialogComponent
 import example.quiz.shared.quizEdit.addQuestion.integration.AddQuestionComponent
 import example.quiz.shared.quizEdit.editThemes.integration.EditThemesComponent
-import example.quiz.shared.quizEdit.question.integration.QuestionComponent
+import example.quiz.shared.quizEdit.questions.integration.QuestionsComponent
 import example.quiz.shared.quizEdit.quizEdit.integration.QuizEditComponent
 import example.quiz.shared.quizlist.integration.QuizListComponent
 
@@ -21,7 +21,7 @@ interface QuizRoot {
 
         data class QuizEdit(
             val componentA: QuizEditComponent,
-            val componentB: QuestionComponent,
+            val componentB: QuestionsComponent,
             val componentC: AddQuestionComponent,
             val componentD: EditThemesComponent
         ) :

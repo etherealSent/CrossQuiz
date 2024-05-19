@@ -8,7 +8,6 @@ internal val stateToModel: (AddQuestionStore.State) -> AddQuestion.Model =
         AddQuestion.Model(
             showDialog = it.showDialog,
             questionType = it.questionType,
-            question = it.question,
             questionTypes = it.questionTypes
         )
     }
