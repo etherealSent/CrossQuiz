@@ -20,7 +20,7 @@ class EditThemesComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
     database: ThemeSharedDatabase,
-    themeList: List<String>
+    themeList: List<Long>
 ) : EditThemes, ComponentContext by componentContext {
     private val store =
         instanceKeeper.getStore {
@@ -32,8 +32,9 @@ class EditThemesComponent(
 
     override val models: Value<EditThemes.Model> = store.asValue().map(stateToModel)
 
+
     init {
-        store.accept(EditThemesStore.Intent.GetThemeItems(themeList))
+        store.accept(EditThemesStore.Intent.GetThemeItems(themeList.map { it.toString() }))
     }
 
     override fun getThemeItems(themeIds: List<String>) {

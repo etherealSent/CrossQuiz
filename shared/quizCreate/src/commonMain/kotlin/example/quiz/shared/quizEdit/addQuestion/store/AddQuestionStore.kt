@@ -1,7 +1,6 @@
 package example.quiz.shared.quizEdit.addQuestion.store
 
 import com.arkivanov.mvikotlin.core.store.Store
-import example.quiz.shared.quizlist.QuestionItem
 import example.quiz.shared.quizlist.QuestionType
 
 interface AddQuestionStore : Store<AddQuestionStore.Intent, AddQuestionStore.State, Nothing> {
@@ -15,8 +14,7 @@ interface AddQuestionStore : Store<AddQuestionStore.Intent, AddQuestionStore.Sta
 
     data class State(
         val showDialog: Boolean = false,
-        val questionType: QuestionType = QuestionType.OneAnswerQuestion,
-        val question: QuestionItem = QuestionItem(),
+        val questionType: QuestionType = QuestionType.OneOptionQuestion,
         val questionTypes: List<QuestionType> = listOf()
     )
 }

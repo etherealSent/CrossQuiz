@@ -13,7 +13,6 @@ import com.badoo.reaktive.scheduler.mainScheduler
 import example.quiz.shared.quizlist.QuizListItem
 import example.quiz.shared.quizlist.Setup
 
-
 class QuizEditStoreProvider(
     private val storeFactory: StoreFactory,
     private val quizDatabase: QuizDatabase,
@@ -45,6 +44,7 @@ class QuizEditStoreProvider(
                 .map(Msg::ItemLoaded)
                 .observeOn(mainScheduler)
                 .subscribeScoped(onSuccess = ::dispatch)
+
         }
 
         override fun executeIntent(intent: QuizEditStore.Intent) {

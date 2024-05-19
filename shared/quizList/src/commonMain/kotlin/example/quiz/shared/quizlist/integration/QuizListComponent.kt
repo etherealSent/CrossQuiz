@@ -28,7 +28,7 @@ class QuizListComponent(
 
     override val models: Value<QuizList.Model> = store.asValue().map(stateToModel)
 
-    override fun onQuizClicked(quizItemId: Long, themeList: List<String>) {
+    override fun onQuizClicked(quizItemId: Long, themeList: List<Long>) {
         output(QuizList.Output.EditQuiz(quizItemId, themeList))
     }
 

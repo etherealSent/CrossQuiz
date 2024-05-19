@@ -11,6 +11,7 @@ import example.quiz.shared.database.quizdata.QuizSharedDatabase
 import example.quiz.shared.quizEdit.quizEdit.QuizEdit
 import example.quiz.shared.quizEdit.quizEdit.store.QuizEditStore
 import example.quiz.shared.quizEdit.quizEdit.store.QuizEditStoreProvider
+import example.quiz.shared.quizlist.QuestionType
 import example.quiz.shared.utils.asValue
 
 class QuizEditComponent(

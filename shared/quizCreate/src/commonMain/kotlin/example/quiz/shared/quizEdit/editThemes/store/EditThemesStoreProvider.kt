@@ -32,6 +32,7 @@ class EditThemesStoreProvider(
 
     private sealed class Msg {
         data class ItemsLoaded(val items: List<ThemeListItem>) : Msg()
+        data class PickedItemsLoaded(val items: List<ThemeListItem>) : Msg()
         object ShowDialog : Msg()
         object CloseDialog : Msg()
         data class SearchChanged(val search: String) : Msg()
@@ -77,6 +78,7 @@ class EditThemesStoreProvider(
     private object ReducerImpl : Reducer<EditThemesStore.State, Msg> {
         override fun EditThemesStore.State.reduce(msg: Msg): EditThemesStore.State = when (msg) {
             is Msg.ItemsLoaded -> copy(themeItems = msg.items)
+            is Msg.PickedItemsLoaded -> copy(checkedThemeItems = msg.items)
             is Msg.ShowDialog -> copy(showDialog = true)
             is Msg.CloseDialog -> copy(
                 showDialog = false,
@@ -150,7 +152,6 @@ class EditThemesStoreProvider(
     }
 
     interface Database {
-
         val updates: Observable<List<ThemeListItem>>
         fun add(title: String): Completable
     }

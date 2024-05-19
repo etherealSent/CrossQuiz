@@ -5,6 +5,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,11 +20,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,14 +37,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -52,12 +50,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -71,25 +70,29 @@ import com.example.quiz.dialog.CreateItemOfList
 import com.example.quiz.dialog.ItemOfList
 import example.quiz.shared.quizEdit.addQuestion.integration.AddQuestionComponent
 import example.quiz.shared.quizEdit.editThemes.integration.EditThemesComponent
-import example.quiz.shared.quizEdit.question.integration.QuestionComponent
+import example.quiz.shared.quizEdit.questions.integration.QuestionsComponent
 import example.quiz.shared.quizEdit.quizEdit.integration.QuizEditComponent
-import example.quiz.shared.quizlist.Answer
-import example.quiz.shared.quizlist.QuestionItem
+import example.quiz.shared.quizlist.MultiplyOptionQuestion
+import example.quiz.shared.quizlist.OptionAnswer
+import example.quiz.shared.quizlist.OptionQuestion
 import example.quiz.shared.quizlist.QuestionType
+import example.quiz.shared.quizlist.TextQuestion
 import example.quiz.shared.quizlist.ThemeListItem
-
-//
-//
 @Composable
 fun QuizCreateContent(
     quizEditComponent: QuizEditComponent,
-    questionComponent: QuestionComponent,
+    questionComponent: QuestionsComponent,
     addQuestionComponent: AddQuestionComponent,
     editThemesComponent: EditThemesComponent
 ) {
     val quizEditModel by quizEditComponent.models.subscribeAsState()
     val editThemesModel by editThemesComponent.models.subscribeAsState()
     val addQuestionModel by addQuestionComponent.models.subscribeAsState()
+    val questionsModel by questionComponent.models.subscribeAsState()
+
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    val isFocused = remember { mutableStateOf(false) }
 
     if (editThemesModel.showDialog) {
         EditThemeDialog(
@@ -98,7 +101,7 @@ fun QuizCreateContent(
                 editThemesComponent.onDismissRequest()
                 editThemesComponent.onCreateTheme()
                 quizEditComponent.updateThemes(editThemesModel.checkedThemeItems.map { it.id.toString() })
-                               },
+            },
             onSearchChanged = editThemesComponent::onSearchChanged,
             onAddThemeClicked = editThemesComponent::onAddThemeClicked,
             onThemeClicked = editThemesComponent::onThemeClicked,
@@ -111,7 +114,7 @@ fun QuizCreateContent(
     if (addQuestionModel.showDialog) {
         DialogCreateQuestion(
             onDismissRequest = addQuestionComponent::onDismissCreateQuestion,
-//            onCreateQuestion = addQuestionComponent::onCreateQuestionClicked,
+            onCreateQuestion = questionComponent::onCreateQuestionClicked,
             onQuestionTypeClicked = addQuestionComponent::onQuestionTypeClicked,
             questionType = addQuestionModel.questionType,
             questionTypes = addQuestionModel.questionTypes
@@ -126,9 +129,15 @@ fun QuizCreateContent(
         )
     },
         floatingActionButton = { FAB(onClick = addQuestionComponent::onAddQuestionClicked) },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().background(Color(0xFFFEF7FF)).clickable(indication = null,
+            interactionSource = remember { MutableInteractionSource() }) {
+                focusManager.clearFocus()
+                questionComponent.resetSelectedQuestionId()
+            }
     ) {
-        Box(modifier = Modifier.padding(it)) {
+        Box(modifier = Modifier
+            .padding(it)
+        ) {
             LazyColumn {
                 item {
                     QuizTopDescription(
@@ -140,9 +149,190 @@ fun QuizCreateContent(
                         onThemeClicked = editThemesComponent::onEditThemeClicked,
                     )
                 }
+                items(questionsModel.questions) { question ->
+                    when (question) {
+                        is OptionQuestion -> OneOptionQuestion(
+                            question = question,
+                            selected = questionsModel.selectedQuestionId == question.id,
+                            onSelected = questionComponent::onQuestionSelected,
+                            onQuestionChanged = questionComponent::onQuestionChanged,
+                            onAddAnswerItem = questionComponent::onCreateAnswerClicked,
+                            onEditOption = questionComponent::onAnswerChanged,
+                            onDeleteOption = questionComponent::onAnswerDeleteClicked,
+                            onOptionAnswerSelected = questionComponent::onRightAnswerPicked,
+                            focusManager = focusManager,
+                            focusRequester = focusRequester,
+                            isFocused = isFocused.value,
+                            onFocused = { isFocused.value = it }
+                        )
+                        is TextQuestion -> TextQuestion(question = question)
+                        is MultiplyOptionQuestion -> MultiplyOptionQuestion(question = question)
+                    }
+                }
             }
         }
     }
+}
+
+@Composable
+fun OneOptionQuestion(
+    modifier: Modifier = Modifier,
+    question: OptionQuestion,
+    selected: Boolean,
+    onSelected: (Long) -> Unit,
+    onQuestionChanged: (String) -> Unit,
+    onAddAnswerItem: () -> Unit,
+    onOptionAnswerSelected: (Long) -> Unit,
+    onDeleteOption: (Long) -> Unit,
+    onEditOption: (Long, String) -> Unit,
+    focusManager: FocusManager,
+    focusRequester: FocusRequester,
+    isFocused: Boolean,
+    onFocused: (Boolean) -> Unit
+) {
+
+    Box(modifier =Modifier.padding(10.dp) .clickable { focusManager.clearFocus() }) {
+        Column(
+            modifier = modifier.background(
+                Color(0xFFFFFFFF),
+                shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
+            ).let {
+                if (selected) {
+                    it.border(
+                        2.dp,
+                        Color(0xFF6750A4),
+                        shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
+                    )
+                } else {
+                    it.border(
+                        1.dp,
+                        Color(0xFF79747E),
+                        shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
+                    )
+                }
+            }.clickable {
+                onSelected(question.id)
+            }
+        ) {
+            Spacer(modifier = Modifier.height(5.dp))
+            TextField(
+                value = question.question,
+                onValueChange = onQuestionChanged,
+                placeholder = { Text("Вопрос") },
+                modifier = Modifier.fillMaxWidth()
+                    .padding(start = 15.dp, top = 10.dp, bottom = 10.dp, end = 10.dp).focusRequester(focusRequester)
+                    .onFocusChanged { focusState ->
+                        onFocused(focusState.isFocused)
+                        if (focusState.isFocused) {
+                            onSelected(question.id)
+                        }
+                    },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = if (selected) Color(0xFFF8F9FA) else Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                textStyle = TextStyle(fontSize = 16.sp)
+            )
+            question.options.forEach { optionAnswer ->
+                OptionAnswer(
+                    modifier = Modifier.focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            onFocused(focusState.isFocused)
+                            if (focusState.isFocused) { onSelected(question.id) } },
+                    optionAnswer = optionAnswer,
+                    selected = question.rightAnswer?.id == optionAnswer.id,
+                    onSelected = { onOptionAnswerSelected(optionAnswer.id) },
+                    onDeleteOption = { onDeleteOption(optionAnswer.id) },
+                    onEditOption = { onEditOption(optionAnswer.id, it) },
+                    questionSelected = selected
+                )
+            }
+            if (selected) {
+                CreateOptionAnswer(onAddAnswerItem = onAddAnswerItem)
+            }
+        }
+    }
+}
+
+@Composable
+fun OptionAnswer(
+    modifier: Modifier = Modifier,
+    optionAnswer: OptionAnswer,
+    selected: Boolean,
+    onSelected: () -> Unit,
+    onEditOption: (String) -> Unit,
+    onDeleteOption: () -> Unit,
+    questionSelected: Boolean
+) {
+    Row(
+        modifier = modifier.fillMaxWidth().padding(5.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        RadioButton(
+            modifier = Modifier,
+            selected = selected,
+            onClick = onSelected,
+            colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF6750A4))
+        )
+        TextField(
+            value = optionAnswer.text,
+            onValueChange = onEditOption,
+            modifier = Modifier.offset(y = -2.dp).width(270.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+        )
+        if (questionSelected) {
+            IconButton(
+                onClick = onDeleteOption,
+                modifier = Modifier
+            ) {
+                Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF49454F))
+            }
+        } else {
+            Spacer(modifier = Modifier.width(36.dp))
+        }
+    }
+}
+
+@Composable
+fun CreateOptionAnswer(
+    modifier: Modifier = Modifier,
+    onAddAnswerItem: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 5.dp),
+    ) {
+        RadioButton(
+            modifier = Modifier,
+            selected = false,
+            onClick = { },
+            colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF6750A4))
+        )
+        Text(
+            text = "Добавить вариант",
+            color = Color(0xFF49454F),
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .clickable { onAddAnswerItem() }
+                .offset(y = 1.dp)
+        )
+    }
+}
+
+@Composable
+fun TextQuestion(
+    question: TextQuestion
+) {
+    Text("TextQuestion")
+}
+
+@Composable
+fun MultiplyOptionQuestion(
+    question: MultiplyOptionQuestion
+) {
+    Text("MultiplyOptionQuestion")
 }
 
 
@@ -218,32 +408,24 @@ private fun QuizTopDescription(
                 unfocusedIndicatorColor = Color.Transparent
             ),
             placeholder = { Text("Описание", fontSize = 16.sp) })
-//        Row {
-//            Spacer(modifier = Modifier.width(15.dp))
-//            Theme(
-//                modifier = Modifier.padding(top = 10.dp, end = 10.dp, bottom = 10.dp),
-//                text = "Создать",
-//                onClicked = onThemeClicked
-//            )
-            LazyRow(modifier = Modifier.padding(vertical = 10.dp)) {
-                item {
-                    Spacer(modifier = Modifier.width(15.dp))
-                }
-                item {
-                    Theme(
-                        modifier = Modifier.padding(end = 10.dp),
-                        text = "Создать",
-                        onClicked = onThemeClicked
-                    )
-                }
-                items(themeList, key = { item -> item.id }) { item ->
-                    Theme(
-                        modifier = Modifier.padding(end = 10.dp),
-                        text = item.title,
-                        onClicked = onThemeClicked
-                    )
-                }
-//            }
+        LazyRow(modifier = Modifier.padding(vertical = 10.dp)) {
+            item {
+                Spacer(modifier = Modifier.width(15.dp))
+            }
+            item {
+                Theme(
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = "Создать",
+                    onClicked = onThemeClicked
+                )
+            }
+            items(themeList, key = { item -> item.id }) { item ->
+                Theme(
+                    modifier = Modifier.padding(end = 10.dp),
+                    text = item.title,
+                    onClicked = onThemeClicked
+                )
+            }
         }
     }
 }
@@ -285,7 +467,11 @@ private fun EditThemeDialog(
     }
 
     Dialog(onDismissRequest = onDismissRequest) {
-        Card(backgroundColor = Color(0xFFECE6F0), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        Card(
+            backgroundColor = Color(0xFFECE6F0),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
             Column {
                 Text(
                     text = "Темы теста",
@@ -330,7 +516,8 @@ private fun EditThemeDialog(
                             .clip(RoundedCornerShape(10.dp)).background(color = Color(0xFFE5E5E5))
                     ) {
                         LazyColumn(modifier = Modifier.heightIn(max = 250.dp)) {
-                            items(temporaryThemeItems,
+                            items(
+                                temporaryThemeItems,
                                 key = { themeOftest -> themeOftest.id }) { themeOfTest ->
                                 ItemOfList(themeQuiz = themeOfTest.title,
                                     checked = checkedThemeItems.contains(themeOfTest),
@@ -340,7 +527,8 @@ private fun EditThemeDialog(
                                         )
                                     })
                             }
-                            items(filteredThemes,
+                            items(
+                                filteredThemes,
                                 key = { themeOftest -> themeOftest.id }) { themeOfTest ->
                                 ItemOfList(themeQuiz = themeOfTest.title,
                                     checked = checkedThemeItems.contains(themeOfTest),
@@ -361,7 +549,11 @@ private fun EditThemeDialog(
                     TextButton(
                         onClick = onDismissRequest,
                     ) {
-                        Text("Назад", color = Color(0xFF6750A4), modifier = Modifier.padding(end = 36.dp))
+                        Text(
+                            "Назад",
+                            color = Color(0xFF6750A4),
+                            modifier = Modifier.padding(end = 36.dp)
+                        )
                     }
                 }
             }
@@ -375,8 +567,8 @@ private fun DialogCreateQuestion(
     onDismissRequest: () -> Unit,
     onQuestionTypeClicked: (QuestionType) -> Unit,
     questionType: QuestionType,
-    questionTypes: List<QuestionType>
-//    onCreateQuestion: (QuestionType) -> Unit,
+    questionTypes: List<QuestionType>,
+    onCreateQuestion: (QuestionType) -> Unit,
 ) {
 
     Dialog(
@@ -414,13 +606,11 @@ private fun DialogCreateQuestion(
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     TextButton(onClick = {
-//                        onCreateQuestion(questionType)
+                        onCreateQuestion(questionType)
                         onDismissRequest()
-                    }
-                    ) {
+                    }) {
                         Text(
-                            "Создать",
-                            color = Color(0xFF6750A4)
+                            "Создать", color = Color(0xFF6750A4)
                         )
                     }
                 }
@@ -439,11 +629,9 @@ private fun QuestionTypes(
         items(questionTypes) { type ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(5.dp)
+                modifier = Modifier.padding(5.dp)
                     .border(1.dp, Color(0xFF79747E), RoundedCornerShape(10.dp))
-                    .clip(RoundedCornerShape(10.dp)).background(Color(0xFFFFFFFF))
-                    .padding(5.dp)
+                    .clip(RoundedCornerShape(10.dp)).background(Color(0xFFFFFFFF)).padding(5.dp)
                     .clickable { onSelected(type) },
             ) {
                 Spacer(modifier = Modifier.height(10.dp))
@@ -451,13 +639,11 @@ private fun QuestionTypes(
                     val strokeWidth = 10f
                     val radius = size.minDimension / 2
                     drawCircle(
-                        radius = radius,
-                        color = Color.Gray
+                        radius = radius, color = Color.Gray
                     )
                     if (selectedType == type) {
                         drawCircle(
-                            radius = radius - strokeWidth / 2,
-                            color = Color(0xFF6750A4)
+                            radius = radius - strokeWidth / 2, color = Color(0xFF6750A4)
                         )
                     }
                 }
@@ -467,590 +653,3 @@ private fun QuestionTypes(
         }
     }
 }
-
-
-@Composable
-private fun AddQuestionDialog() {
-
-}
-
-//
-//    var selected by remember { mutableStateOf(0L) }
-//
-//    val scrollState = rememberScrollState()
-//    val listQuestion by remember {
-//        mutableStateOf(
-//            mutableListOf(
-//                QuestionItem.OneAnswerQuestion(
-//                    id = 1L,
-//                    orderNum = 1L,
-//                    question = "Question 1",
-//                    answerList = listOf(
-//                        Answer(id = 1, orderNum = 1L, text = "Answer 1"),
-//                        Answer(id = 2, text = "Answer 2"),
-//                        Answer(id = 3, text = "Answer 3"),
-//                    ),
-//                    pickedAnswerId = 1L,
-//                    rightAnswerId = 1L
-//                ),
-//                QuestionItem.OneAnswerQuestion(
-//                    id = 2L,
-//                    orderNum = 2L,
-//                    question = "Question 2",
-//                    answerList = listOf(
-//                        Answer(id = 1, text = "Answer 1"),
-//                        Answer(id = 2, text = "Answer 2"),
-//                        Answer(id = 3, text = "Answer 3"),
-//                    ),
-//                    pickedAnswerId = 1L,
-//                    rightAnswerId = 1L
-//                )
-//            )
-//        )
-//    }
-//
-//
-////        QuestionItem.MultiplyAnswerQuestion(
-////            id = 2,
-////            orderNum = 2,
-////            question = "Question 2",
-////            answerIdList = listOf(1, 2),
-////            rightAnswerIdList = listOf(1, 2)
-////        ),
-////        QuestionItem.ShortAnswerQuestion(
-////            id = 3,
-////            orderNum = 3,
-////            question = "Question 3",
-////            answer = "Answer",
-////            rightAnswer = "Right Answer"
-////        )
-//
-//    if (quizCreateModel.showDialog) {
-//        DialogCreateQuestion(
-//            onShowDialog = component::onShowDialog,
-//            onCreateQuestion = {
-//                listQuestion.add(
-////                    when (it) {
-////                        TypeQuestion.OneAnswerQuestion ->
-//                    QuestionItem.OneAnswerQuestion(
-//                        id = listQuestion.size + 1L,
-//                        orderNum = listQuestion.size + 1L,
-//                        question = "Question ${listQuestion.size + 1}",
-//                        answerList = listOf(
-//                            Answer(id = 1, text = "Answer 1"),
-//                            Answer(id = 2, text = "Answer 2"),
-//                            Answer(id = 3, text = "Answer 3"),
-//                        ),
-//                        pickedAnswerId = 0L,
-//                        rightAnswerId = 1L
-//                    )
-//
-////                        TypeQuestion.MultiplyAnswerQuestion -> QuestionItem.MultiplyAnswerQuestion()
-////                        TypeQuestion.ShortAnswerQuestion -> QuestionItem.ShortAnswerQuestion()
-//                )
-//            }
-//        )
-//    }
-//
-//    Scaffold(
-//        topBar = {
-//            TopBar(
-//                onBackClicked = component::onBackClicked
-//            )
-//        },
-//        floatingActionButton = { FAB(onClick = component::onShowDialog) },
-//        modifier = Modifier.fillMaxSize()
-//    ) {
-//        Box(modifier = Modifier.padding(it)) {
-//            LazyColumn {
-//                item {
-//                    Column(
-//                        modifier = Modifier.fillMaxWidth().background(
-//                            Color(0xFFD0BCFF),
-//                            shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
-//                        )
-//                            .padding(start = 20.dp)
-//                    ) {
-//                        Text(
-//                            text = quizCreateModel.title,
-//                            fontSize = 28.sp,
-//                            modifier = Modifier.padding(end = 10.dp)
-//                        )
-//                        LazyRow(modifier = Modifier.padding(vertical = 10.dp)) {
-//                            items(quizCreateModel.themeList) { item ->
-//                                Theme(
-//                                    modifier = Modifier.padding(end = 10.dp),
-//                                    themeListItem = item,
-//                                    onClicked = {}
-//                                )
-//                            }
-//                            item {
-//                                Theme(
-//                                    modifier = Modifier.padding(end = 10.dp),
-//                                    themeListItem = "Создать",
-//                                    onClicked = {}
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//                items(listQuestion) {
-//                    OneAnswerQuestion(
-//                        Modifier.padding(top = 20.dp),
-//                        selected = selected == it.id,
-//                        onSelected = {
-//                            if (selected == it.id) {
-//                                selected = 0L
-//                            } else {
-//                                selected = it.id
-//                            }
-//                        },
-//                        onDeleteQuestion = { listQuestion.remove(it) }
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//
-
-//
-
-//
-//@Composable
-//private fun DialogCreateQuestion(
-//    onShowDialog: () -> Unit,
-//    onCreateQuestion: (TypeQuestion) -> Unit,
-//) {
-//
-//    var questionType = remember { mutableStateOf(TypeQuestion.OneAnswerQuestion) }
-//
-//    Dialog(
-//        onDismissRequest = onShowDialog
-//    ) {
-//        Card(
-//            shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().padding(16.dp),
-//        ) {
-//            Column(
-//                modifier = Modifier.padding(16.dp),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                Text(
-//                    text = "Тип вопроса",
-//                    modifier = Modifier.padding(24.dp).fillMaxWidth(),
-//                    fontSize = 24.sp,
-//                    textAlign = TextAlign.Center,
-//                    color = Color(0xFF1D1B20)
-//                )
-//                Spacer(modifier = Modifier.height(16.dp))
-//                QuestionTypes(
-//                    selected = questionType.value,
-//                    onSelected = {
-//                        if (questionType.value.equals(it)) {
-//                            questionType.value = TypeQuestion.OneAnswerQuestion
-//                        } else {
-//                            questionType.value = it
-//                        }
-//                    }
-//                )
-//                Spacer(modifier = Modifier.height(16.dp))
-//                Row(
-//                    modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp),
-//                    horizontalArrangement = Arrangement.Center,
-//                ) {
-//                    TextButton(
-//                        onClick = onShowDialog,
-//                    ) {
-//                        Text("Назад", color = Color(0xFF6750A4))
-//                    }
-//                    Spacer(modifier = Modifier.width(10.dp))
-//                    TextButton(onClick = {
-//                        onCreateQuestion(questionType.value)
-//                        onShowDialog()
-//                    }
-//                    ) {
-//                        Text(
-//                            "Создать",
-//                            color = Color(0xFF6750A4)
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-
-
-//@Composable
-//private fun QuestionTypes(
-//    selected: TypeQuestion,
-//    onSelected: (TypeQuestion) -> Unit,
-//) {
-//
-//    val types = listOf<TypeQuestion>(
-//        TypeQuestion.OneAnswerQuestion,
-//        TypeQuestion.MultiplyAnswerQuestion,
-//        TypeQuestion.MultiplyAnswerQuestion
-//    )
-//
-//    LazyRow {
-//        items(types) { type ->
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                modifier = Modifier
-//                    .padding(5.dp)
-//                    .border(1.dp, Color(0xFF79747E), RoundedCornerShape(10.dp))
-//                    .clip(RoundedCornerShape(10.dp)).background(Color(0xFFFFFFFF))
-//                    .padding(5.dp)
-//                    .clickable { onSelected(type) },
-//            ) {
-//                Spacer(modifier = Modifier.height(10.dp))
-//                Canvas(modifier = Modifier.size(12.dp)) {
-//                    val strokeWidth = 10f
-//                    val radius = size.minDimension / 2
-//                    drawCircle(
-//                        radius = radius,
-//                        color = Color.Gray
-//                    )
-//                    if (selected == type) {
-//                        drawCircle(
-//                            radius = radius - strokeWidth / 2,
-//                            color = Color(0xFF6750A4)
-//                        )
-//                    }
-//                }
-//                Spacer(modifier = Modifier.height(10.dp))
-//                Text(text = type.name, fontSize = 14.sp)
-//            }
-//        }
-//    }
-//}
-//
-////@Composable
-////private fun QuestionContent(
-////    item: QuestionItem,
-////    onSelected: (Long) -> Unit,
-////    selected: Long,
-////    modifier: Modifier
-////) {
-////    when (item) {
-////        is QuestionItem.OneAnswerQuestion -> {
-////            OneAnswerQuestion(
-////                modifier = modifier,
-////                selected = selected == item.id,
-////                onSelected = { onSelected(item.id) }
-////            )
-////        }
-////
-////        is QuestionItem.MultiplyAnswerQuestion -> {
-////            MultiplyAnswerQuestion(modifier)
-////        }
-////
-////        is QuestionItem.ShortAnswerQuestion -> {
-////            ShortAnswerQuestion(modifier)
-////        }
-////    }
-////    if (selected == i) {
-////        QuestionActions()
-////    }
-////}
-//
-//@Composable
-//private fun MultiplyAnswerQuestion(
-//    modifier: Modifier,
-//    selected: Boolean = false,
-//    onSelected: () -> Unit
-//) {
-//
-//    val pickedAnswerIds by remember { mutableStateOf(mutableListOf<Long>()) }
-//    val answerOptions by remember { mutableStateOf(mutableListOf<Answer>()) }
-//    var question by remember { mutableStateOf("") }
-//
-//    Column(
-//        modifier = modifier.background(
-//            Color(0xFFFEF7FF),
-//            shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-//        ).let {
-//            if (selected) {
-//                it.border(
-//                    3.dp,
-//                    Color(0xFF6750A4),
-//                    shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-//                )
-//            } else {
-//                it.border(
-//                    1.dp,
-//                    Color(0xFF6750A4),
-//                    shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-//                )
-//            }
-//        }.clickable {
-//            onSelected()
-//        }
-//    ) {
-//        Spacer(modifier = Modifier.height(5.dp))
-//        TextField(
-//            value = question,
-//            onValueChange = { question = it },
-//            label = { Text("Вопрос") },
-//            modifier = Modifier.fillMaxWidth()
-//                .padding(start = 15.dp, top = 10.dp, bottom = 10.dp, end = 10.dp).clickable {
-//                    onSelected()
-//                }
-//        )
-//        Spacer(modifier = Modifier.height(10.dp))
-//        answerOptions.forEach {  answer ->
-//            AnswerItem(
-//                answer = answer,
-//                selected = pickedAnswerIds.contains(answer.id),
-//                onSelected = {
-//                    if (pickedAnswerIds.contains(answer.id)) pickedAnswerIds.remove(
-//                        answer.id
-//                    ) else pickedAnswerIds.add(answer.id)
-//                },
-//                onDeleteOption = { answerOptions.remove(answer) },
-//                onEditOption = {
-//                    answerOptions[answerOptions.indexOf(answer)] = answer.copy(text = it)
-//                }
-//            )
-//        }
-////        LazyColumn {
-////            items(answerOptions) { answer ->
-////                AnswerItem(
-////                    answer = answer,
-////                    selected = pickedAnswerIds.contains(answer.id),
-////                    onSelected = {
-////                        if (pickedAnswerIds.contains(answer.id)) pickedAnswerIds.remove(
-////                            answer.id
-////                        ) else pickedAnswerIds.add(answer.id)
-////                    },
-////                    onDeleteOption = { answerOptions.remove(answer) },
-////                    onEditOption = {
-////                        answerOptions[answerOptions.indexOf(answer)] = answer.copy(text = it)
-////                    }
-////                )
-////            }
-////        }
-//        AddAnswerItem(onAddAnswerItem = {
-//            answerOptions.add(
-//                Answer(
-//                    id = answerOptions.size + 1L,
-//                    orderNum = answerOptions.size + 1L,
-//                    text = ""
-//                )
-//            )
-//        })
-//        Spacer(modifier = Modifier.height(10.dp))
-//    }
-//    Spacer(modifier = Modifier.height(10.dp))
-//    if (selected) {
-//        QuestionActions(
-//            onDeleteQuestion = {}
-//        )
-//    }
-//}
-//
-//@Composable
-//fun AddAnswerItem(
-//    onAddAnswerItem: () -> Unit
-//) {
-//    Row(
-//        modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 5.dp),
-//    ) {
-//        RadioButton(
-//            modifier = Modifier,
-//            selected = false,
-//            onClick = { },
-//            colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF6750A4))
-//        )
-//        Text(
-//            text = "Добавить вариант",
-//            color = Color(0xFF49454F),
-//            modifier = Modifier.padding(top = 12.dp).clickable { onAddAnswerItem() }
-//        )
-//    }
-//}
-//
-//
-@Composable
-private fun AnswerItem(
-    answer: Answer,
-    selected: Boolean,
-    onSelected: () -> Unit,
-    onDeleteOption: () -> Unit,
-    onEditOption: (String) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(5.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        RadioButton(
-            modifier = Modifier,
-            selected = selected,
-            onClick = onSelected,
-            colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF6750A4))
-        )
-        TextField(
-            value = answer.text,
-            onValueChange = onEditOption,
-            modifier = Modifier.offset(y = -1.dp).width(270.dp)
-        )
-        IconButton(
-            onClick = onDeleteOption,
-            modifier = Modifier
-        ) {
-            Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF49454F))
-        }
-    }
-}
-
-//@Composable
-//private fun OneAnswerQuestion(
-//    modifier: Modifier,
-//    question: QuestionItem,
-//    selected: Boolean,
-//    onSelected: () -> Unit,
-//    onDeleteQuestion: () -> Unit,
-//) {
-//
-//    var pickedAnswerId by remember { mutableStateOf(0L) }
-//    val answerOptions by remember {
-//        mutableStateOf(
-//            mutableListOf<Answer>(
-//                Answer(
-//                    id = 1,
-//                    orderNum = 1,
-//                    text = "Answer 1"
-//                ),
-//                Answer(
-//                    id = 2,
-//                    orderNum = 2,
-//                    text = "Answer 2"
-//                ),
-//                Answer(
-//                    id = 3,
-//                    orderNum = 3,
-//                    text = "Answer 3"
-//                )
-//            )
-//        )
-//    }
-//    var question by remember { mutableStateOf("") }
-//
-//    Box(
-//        modifier = modifier.padding(5.dp).background(
-//            Color(0xFFFEF7FF),
-//            shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-//        ).let {
-//            if (selected) {
-//                it.border(
-//                    3.dp,
-//                    Color(0xFF6750A4),
-//                    shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-//                )
-//            } else {
-//                it.border(
-//                    1.dp,
-//                    Color(0xFF6750A4),
-//                    shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-//                )
-//            }
-//        }.clickable {
-//            onSelected()
-//        }
-//    ) {
-//        Column {
-//            Spacer(modifier = Modifier.height(5.dp))
-//            TextField(
-//                value = question,
-//                onValueChange = { question = it },
-//                label = { Text("Вопрос") },
-//                modifier = Modifier.fillMaxWidth()
-//                    .padding(start = 15.dp, top = 10.dp, bottom = 10.dp, end = 10.dp).clickable {
-//                        onSelected()
-//                    }
-//            )
-//            Spacer(modifier = Modifier.height(10.dp))
-//            Column(Modifier.wrapContentHeight()) {
-////                items(answerOptions) { answer ->
-//                answerOptions.forEach { answer ->
-//                    AnswerItem(
-//                        answer = answer,
-//                        selected = (pickedAnswerId == answer.id),
-//                        onSelected = {
-//                            pickedAnswerId = if (pickedAnswerId == answer.id) 0L else answer.id
-//                        },
-//                        onDeleteOption = { answerOptions.remove(answer) },
-//                        onEditOption = {
-//                            answerOptions[answerOptions.indexOf(answer)] = answer.copy(text = it)
-//                        }
-//                    )
-//                }
-//                    AddAnswerItem(onAddAnswerItem = {
-//                        answerOptions.add(
-//                            Answer(
-//                                id = answerOptions.size + 1L,
-//                                orderNum = answerOptions.size + 1L,
-//                                text = ""
-//                            )
-//                        )
-//                    })
-////                }
-//            }
-//        }
-//    }
-//    Spacer(modifier = Modifier.height(10.dp))
-//    if (selected) {
-//        QuestionActions(onDeleteQuestion = onDeleteQuestion)
-//    }
-//}
-//
-//
-//@Composable
-//private fun ShortAnswerQuestion(modifier: Modifier) {
-//
-//}
-//
-//
-//@Composable
-//private fun QuestionActions(
-//    onDeleteQuestion: () -> Unit
-//) {
-//    Row(
-//        modifier = Modifier.fillMaxWidth(),
-//        horizontalArrangement = Arrangement.End
-//    ) {
-//        IconButton(
-//            onClick = { },
-//            modifier = Modifier
-//                .background(color = Color(0xFFD0BCFF), shape = RoundedCornerShape(100))
-//
-//        ) {
-//            Icon(Icons.Default.Add, contentDescription = "Add", tint = Color(0xFF49454F))
-//        }
-//        Spacer(modifier = Modifier.width(15.dp))
-//        IconButton(
-//            onClick = onDeleteQuestion,
-//            modifier = Modifier
-//                .background(Color(0xFFD0BCFF), shape = RoundedCornerShape(100))
-//        ) {
-//            Icon(Icons.Default.Delete, contentDescription = "Add", tint = Color(0xFF49454F))
-//        }
-//        Spacer(modifier = Modifier.width(15.dp))
-//        IconButton(
-//            onClick = { },
-//            modifier = Modifier
-//                .background(Color(0xFFD0BCFF), shape = RoundedCornerShape(100))
-//        ) {
-//            Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color(0xFF49454F))
-//        }
-//
-//    }
-//}
-//
-//@Composable
-//private fun QuestionAction() {
-//
-//}
