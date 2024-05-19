@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import quizSolve.QuizSolveRepository
 
+// TODO сделать таймер потом
 internal class QuizSolveStoreProvider(
     private val storeFactory: StoreFactory,
     private val quizSolveRepository: QuizSolveRepository,

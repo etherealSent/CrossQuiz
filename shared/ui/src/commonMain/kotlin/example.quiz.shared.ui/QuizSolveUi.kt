@@ -76,7 +76,7 @@ fun QuizSolveScreen(component: QuizSolveComponent) {
                             )
                         },
                         content = {
-                            MainContent(
+                            QuizMainContent(
                                 question = quizState.currentQuestion,
                                 modifier = Modifier.padding(it)
                             )
@@ -86,6 +86,7 @@ fun QuizSolveScreen(component: QuizSolveComponent) {
                                 onNextButtonClick = { component.onNextClick() },
                                 // TODO ELDAR handle it in component
                                 isEnabled = true,
+                                text = nextQuestionText,
                             )
                         }
                     )
@@ -95,15 +96,13 @@ fun QuizSolveScreen(component: QuizSolveComponent) {
                 Surface {
                     Scaffold(
                         content = {
-                            MainContent(
-                                question = quizState.currentQuestion,
-                                modifier = Modifier.padding(it)
-                            )
+                            MainContent(modifier = Modifier.padding(it))
                         },
                         bottomBar = {
                             BottomNavigation(
                                 onNextButtonClick = { component.onNextClick() },
                                 isEnabled = true,
+                                text = "Начать тест"
                             )
                         }
                     )
@@ -145,7 +144,7 @@ private fun Error(
 }
 
 @Composable
-private fun MainContent(
+private fun QuizMainContent(
     question: Question,
     modifier: Modifier,
 ) {
@@ -162,6 +161,13 @@ private fun MainContent(
             //is Question.Multiple -> MultipleAnswerList(answers = question.answers)
         }
     }
+}
+
+@Composable
+private fun MainContent(
+    modifier: Modifier,
+) {
+    // TODO
 }
 
 @Composable
@@ -441,6 +447,7 @@ private fun BottomNavigation(
     modifier: Modifier = Modifier,
     onNextButtonClick: () -> Unit,
     isEnabled: Boolean,
+    text: String,
 ) {
     Button(
         enabled = isEnabled,
@@ -456,6 +463,6 @@ private fun BottomNavigation(
             disabledBackgroundColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f),
         )
     ) {
-        Text(text = nextQuestionText)
+        Text(text = text)
     }
 }
