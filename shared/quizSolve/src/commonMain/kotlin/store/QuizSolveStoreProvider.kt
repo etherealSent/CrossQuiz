@@ -50,20 +50,6 @@ internal class QuizSolveStoreProvider(
                     val currentQuestion = solveState.currentQuestion
                     when (intent) {
                         is QuizSolveStore.Intent.QuizSolveIntent.AnswerClick -> {
-//                            val currentChosenAnswers = solveState.currentChosenAnswer
-//                            val answers = if (currentQuestion is Question.Single) {
-//                                if (currentChosenAnswers.contains(intent.answer)) {
-//                                    listOf()
-//                                } else {
-//                                    listOf(intent.answer)
-//                                }
-//                            } else {
-//                                if (currentChosenAnswers.contains(intent.answer)) {
-//                                    currentChosenAnswers.filter { it == intent.answer }
-//                                } else {
-//                                    currentChosenAnswers + intent.answer
-//                                }
-//                            }
                             dispatch(Msg.AnswersChanged(intent.answer))
                         }
 
@@ -79,7 +65,6 @@ internal class QuizSolveStoreProvider(
                     }
                 }
 
-                // +
                 is QuizSolveStore.Intent.LoadQuiz -> {
                     scope.launch {
                         val response = withContext(Dispatchers.Default) {
