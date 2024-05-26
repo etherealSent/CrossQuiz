@@ -59,18 +59,20 @@ fun QuizSolveScreen(component: QuizSolveComponent) {
         is QuizSolveState.Loading -> {
             Loading(modifier = Modifier)
         }
+
         is QuizSolveState.Error -> {
             Error { component.onReloadClick() }
         }
+
         is QuizSolveState.QuizSolve -> {
             val quizState = state as QuizSolveState.QuizSolve
             if (quizState.isStarted) {
                 Surface {
                     Scaffold(
                         topBar = {
-                            // TODO ELDAR handle it in component
                             ProgressBar(
-                                progress = 0.5f, modifier = Modifier
+                                progress = quizState.progressBar,
+                                modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 16.dp, horizontal = 8.dp)
                             )
@@ -84,8 +86,7 @@ fun QuizSolveScreen(component: QuizSolveComponent) {
                         bottomBar = {
                             BottomNavigation(
                                 onNextButtonClick = { component.onNextClick() },
-                                // TODO ELDAR handle it in component
-                                isEnabled = true,
+                                isEnabled = quizState.canMoveForward,
                                 text = nextQuestionText,
                             )
                         }
@@ -96,7 +97,10 @@ fun QuizSolveScreen(component: QuizSolveComponent) {
                 Surface {
                     Scaffold(
                         content = {
-                            MainContent(modifier = Modifier.padding(it))
+                            MainContent(
+                                quizSolveState = quizState,
+                                modifier = Modifier.padding(it),
+                            )
                         },
                         bottomBar = {
                             BottomNavigation(
@@ -166,8 +170,11 @@ private fun QuizMainContent(
 @Composable
 private fun MainContent(
     modifier: Modifier,
+    quizSolveState: QuizSolveState.QuizSolve,
 ) {
-    // TODO
+    Column(modifier = modifier) {
+        Text(quizSolveState.quiz.id)
+    }
 }
 
 @Composable

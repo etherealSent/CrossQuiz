@@ -17,5 +17,7 @@ interface QuizSolveStore : Store<QuizSolveStore.Intent, QuizSolveState, Nothing>
         }
 
         data class LoadQuiz(val id: Int) : Intent
+
+        data object StartQuiz : Intent
     }
 }

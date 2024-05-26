@@ -66,8 +66,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import com.example.quiz.dialog.CreateItemOfList
-import com.example.quiz.dialog.ItemOfList
 import example.quiz.shared.quizEdit.addQuestion.integration.AddQuestionComponent
 import example.quiz.shared.quizEdit.editThemes.integration.EditThemesComponent
 import example.quiz.shared.quizEdit.questions.integration.QuestionsComponent

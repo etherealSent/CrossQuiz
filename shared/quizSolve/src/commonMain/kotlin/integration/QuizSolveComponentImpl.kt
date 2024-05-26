@@ -49,6 +49,6 @@ class QuizSolveComponentImpl(
     }
 
     override fun onQuizStart() {
-        TODO("Not yet implemented")
+        store.accept(QuizSolveStore.Intent.StartQuiz)
     }
 }

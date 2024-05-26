@@ -5,7 +5,10 @@ sealed interface QuizSolveState {
         val currentQuestion: Question,
         val currentChosenAnswer: Answer?,
         val chosenAnswers: HashMap<Question, Answer>,
+        val questionIndex: Int = 0,
         val isStarted: Boolean = false,
+        val canMoveForward: Boolean = false,
+        val progressBar: Float = 0f,
     ): QuizSolveState
 
     data object Loading: QuizSolveState

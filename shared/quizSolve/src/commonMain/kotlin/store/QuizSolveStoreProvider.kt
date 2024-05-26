@@ -35,8 +35,10 @@ internal class QuizSolveStoreProvider(
 
     private sealed class Msg {
         data class AnswersChanged(val answers: Answer) : Msg()
-        data class QuestionChanged(val question: Question, val answer: Answer) : Msg()
+        data object QuestionChanged : Msg()
         data class QuizLoaded(val quiz: QuizModel?) : Msg()
+        data object QuizStarted : Msg()
+        data object QuizFinished : Msg()
     }
 
     private inner class ExecutorImpl :
@@ -68,13 +70,9 @@ internal class QuizSolveStoreProvider(
                         is QuizSolveStore.Intent.QuizSolveIntent.NextQuestion -> {
                             if (currentQuestion == solveState.quiz.questions.last()) {
                                 // Open next screen + send data to backend
+                                dispatch(Msg.QuizFinished)
                             } else {
-//                                dispatch(Msg.QuestionChanged(
-//                                    intent.answer))
-//                                val currentQuestionId =
-//                                    solveState.quiz.questions.indexOf(currentQuestion)
-//                                dispatch(Msg.QuestionChanged(solveState.quiz.questions[currentQuestionId + 1]))
-                                // save question in map
+                                dispatch(Msg.QuestionChanged)
                             }
                         }
 
@@ -95,6 +93,10 @@ internal class QuizSolveStoreProvider(
                         dispatch(Msg.QuizLoaded(quiz))
                     }
                 }
+
+                is QuizSolveStore.Intent.StartQuiz -> {
+                    dispatch(Msg.QuizStarted)
+                }
             }
         }
     }
@@ -105,18 +107,37 @@ internal class QuizSolveStoreProvider(
             return when (msg) {
                 is Msg.AnswersChanged -> {
                     when (this) {
-                        is QuizSolveState.QuizSolve -> copy(currentChosenAnswer = msg.answers)
+                        is QuizSolveState.QuizSolve -> copy(
+                            currentChosenAnswer = msg.answers,
+                            canMoveForward = true,
+                        )
+
                         is QuizSolveState.Loading -> this
                         is QuizSolveState.Error -> this
                     }
                 }
+
                 is Msg.QuestionChanged -> {
                     when (this) {
-                        is QuizSolveState.QuizSolve -> copy(currentQuestion = msg.question)
+                        is QuizSolveState.QuizSolve -> {
+                            val nextQuestionIndex = this.questionIndex + 1
+                            val currentQuestion = currentQuestion
+                            val chosenAnswers = chosenAnswers
+                            val nextQuestion = quiz.questions[nextQuestionIndex]
+                            chosenAnswers[currentQuestion] = currentChosenAnswer!!
+                            copy(
+                                currentQuestion = nextQuestion,
+                                canMoveForward = false,
+                                questionIndex = nextQuestionIndex,
+                                chosenAnswers = chosenAnswers,
+                            )
+                        }
+
                         is QuizSolveState.Loading -> this
                         is QuizSolveState.Error -> this
                     }
                 }
+
                 is Msg.QuizLoaded -> {
                     val quiz = msg.quiz
                     if (quiz != null) {
@@ -125,11 +146,23 @@ internal class QuizSolveStoreProvider(
                             currentQuestion = quiz.questions.first(),
                             currentChosenAnswer = null,
                             chosenAnswers = hashMapOf(),
+                            isStarted = false,
                         )
                     } else {
                         QuizSolveState.Error
                     }
                 }
+
+                is Msg.QuizStarted -> {
+                    when (this) {
+                        is QuizSolveState.QuizSolve -> copy(isStarted = true)
+                        is QuizSolveState.Loading -> this
+                        is QuizSolveState.Error -> this
+                    }
+                }
+
+                // TODO
+                is Msg.QuizFinished -> {this}
             }
         }
     }
