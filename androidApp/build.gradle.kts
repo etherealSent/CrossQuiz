@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":shared:database:quizdata"))
     implementation(project(":shared:database:themedata"))
     implementation(project(":shared:utils"))
+    implementation(project(":shared:di"))
     implementation(project(":shared:root"))
     implementation(project(":shared:ui"))
     implementation(compose.material)

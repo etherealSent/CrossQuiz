@@ -1,5 +1,6 @@
 package example.quiz.shared.quizlist.integration
 
+import GetQuizzesListUseCase
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.operator.map
@@ -11,13 +12,18 @@ import example.quiz.shared.utils.asValue
 import example.quiz.shared.database.quizdata.QuizSharedDatabase
 import example.quiz.shared.quizlist.QuizList
 import example.quiz.shared.quizlist.store.QuizListStoreProvider
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class QuizListComponent(
     componentContext: ComponentContext,
     storeFactory: StoreFactory,
     database: QuizSharedDatabase,
     private val output: Consumer<QuizList.Output>
-) : QuizList, ComponentContext by componentContext {
+) : QuizList, ComponentContext by componentContext, KoinComponent {
+
+    private val getQuizzesListUseCase: GetQuizzesListUseCase by inject()
+
     private val store =
         instanceKeeper.getStore {
             QuizListStoreProvider(
@@ -31,5 +37,4 @@ class QuizListComponent(
     override fun onQuizClicked(quizItemId: Long, themeList: List<Long>) {
         output(QuizList.Output.EditQuiz(quizItemId, themeList))
     }
-
 }

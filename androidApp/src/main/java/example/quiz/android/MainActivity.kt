@@ -15,6 +15,7 @@ import example.quiz.shared.database.themedata.ThemeDatabaseDriver
 import example.quiz.shared.root.QuizRoot
 import example.quiz.shared.root.integration.QuizRootComponent
 import example.quiz.shared.ui.QuizRootContent
+import getCommonModules
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
         startKoin {
             androidContext(this@MainActivity)
             androidLogger()
+            getCommonModules()
         }
     }
 
