@@ -3,12 +3,10 @@ package quizList
 import ApiResponse
 import Routing
 import io.ktor.client.HttpClient
-import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.http.HttpMethod
 import quizList.models.QuizListItem
 import quizList.models.QuizListRequest
-import quizResult.models.QuizResult
 import safeRequest
 
 class QuizListRepositoryImpl(

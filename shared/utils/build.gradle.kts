@@ -12,6 +12,7 @@ kotlin {
                 implementation(libs.arkivanov.mvikotlin)
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.badoo.reaktive)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
     }

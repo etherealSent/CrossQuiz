@@ -10,8 +10,11 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:utils"))
+                implementation(project(":shared:domain"))
+                implementation(project(":shared:di"))
                 implementation(project(":shared:database:quizdata"))
                 implementation(project(":shared:database:themedata"))
+                implementation(libs.koin.core)
                 implementation(libs.arkivanov.decompose)
                 implementation(libs.arkivanov.mvikotlin)
                 implementation(libs.arkivanov.mvikotlin.extensions.reaktive)
